@@ -5,4 +5,8 @@
     <string name="password_hint">Password</string>
     <string name="signup_button_hint">Create account</string>
     <string name="login_button_label">Login</string>
+    <string name="login_destination_title">Login</string>
+    <string name="signup_destination_title">SignUp</string>
+    <string name="no_destination_title" />
+    <string name="app_name">Social App</string>
 </resources>

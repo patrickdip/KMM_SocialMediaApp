@@ -107,9 +107,9 @@ fun SignUpScreen(
                 Text(text = stringResource(id = R.string.signup_button_hint))
             }
 
-//            GoToLogin(modifier) {
-//                onNavigateToLogin()
-//            }
+            GoToLogin(modifier) {
+                onNavigateToLogin()
+            }
 
         }
 
@@ -139,7 +139,7 @@ fun GoToLogin(
     onNavigateToLogin: () -> Unit
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
+        modifier = modifier, horizontalArrangement = Arrangement.spacedBy(
             SmallSpacing
         )
     ) {
