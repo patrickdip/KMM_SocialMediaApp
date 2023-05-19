@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.annotation.Destination
 
 @Composable
-@Destination
+@Destination(start = true)
 fun HomeScreen(
     modifier: Modifier = Modifier
 ) {

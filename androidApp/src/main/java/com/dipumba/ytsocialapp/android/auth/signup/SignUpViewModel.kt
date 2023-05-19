@@ -3,14 +3,17 @@ package com.dipumba.ytsocialapp.android.auth.signup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dipumba.ytsocialapp.android.common.datastore.UserPreferences
 import com.dipumba.ytsocialapp.auth.domain.usecase.SignUpUseCase
 import com.dipumba.ytsocialapp.common.util.Result
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
-    private val signUpUseCase: SignUpUseCase
+    private val signUpUseCase: SignUpUseCase,
+    private val dataStore: DataStore<UserPreferences>
 ): ViewModel() {
     var uiState by mutableStateOf(SignUpUiState())
         private set
@@ -29,6 +32,17 @@ class SignUpViewModel(
                     )
                 }
                 is Result.Success -> {
+                    dataStore.updateData {
+                        it.copy(
+                            id = authResultData.data!!.id,
+                            name = authResultData.data!!.name,
+                            bio = authResultData.data!!.bio,
+                            avatar = authResultData.data!!.avatar,
+                            token = authResultData.data!!.token,
+                            followersCount = authResultData.data!!.followersCount,
+                            followingCount = authResultData.data!!.followingCount,
+                        )
+                    }
                     uiState.copy(
                         isAuthenticating = false,
                         authenticationSucceed = true

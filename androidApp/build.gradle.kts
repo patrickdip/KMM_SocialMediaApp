@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.devtools.ksp") version "1.8.0-1.0.8"
+    //Kotlinx Serialization
+    kotlin("plugin.serialization") version "1.8.20"
 }
 
 android {

@@ -3,14 +3,17 @@ package com.dipumba.ytsocialapp.android.auth.login
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dipumba.ytsocialapp.android.common.datastore.UserPreferences
 import com.dipumba.ytsocialapp.auth.domain.usecase.SignInUseCase
 import com.dipumba.ytsocialapp.common.util.Result
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val dataStore: DataStore<UserPreferences>
 ): ViewModel() {
     var uiState by mutableStateOf(LoginUiState())
         private set
@@ -29,6 +32,17 @@ class LoginViewModel(
                     )
                 }
                 is Result.Success -> {
+                    dataStore.updateData {
+                        it.copy(
+                            id = authResultData.data!!.id,
+                            name = authResultData.data!!.name,
+                            bio = authResultData.data!!.bio,
+                            avatar = authResultData.data!!.avatar,
+                            token = authResultData.data!!.token,
+                            followersCount = authResultData.data!!.followersCount,
+                            followingCount = authResultData.data!!.followingCount,
+                        )
+                    }
                     uiState.copy(
                         isAuthenticating = false,
                         authenticationSucceed = true
