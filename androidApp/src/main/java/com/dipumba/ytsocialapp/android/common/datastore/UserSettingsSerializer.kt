@@ -6,15 +6,15 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
-object UserSettingsSerializer: Serializer<UserPreferences> {
+object UserSettingsSerializer: Serializer<UserSettings> {
 
-    override val defaultValue: UserPreferences
-        get() = UserPreferences()
+    override val defaultValue: UserSettings
+        get() = UserSettings()
 
-    override suspend fun readFrom(input: InputStream): UserPreferences {
+    override suspend fun readFrom(input: InputStream): UserSettings {
         return try {
             Json.decodeFromString(
-                deserializer = UserPreferences.serializer(),
+                deserializer = UserSettings.serializer(),
                 string = input.readBytes().decodeToString()
             )
         }catch (serializationExc: SerializationException){
@@ -23,10 +23,10 @@ object UserSettingsSerializer: Serializer<UserPreferences> {
         }
     }
 
-    override suspend fun writeTo(t: UserPreferences, output: OutputStream) {
+    override suspend fun writeTo(t: UserSettings, output: OutputStream) {
         output.write(
             Json.encodeToString(
-                serializer = UserPreferences.serializer(),
+                serializer = UserSettings.serializer(),
                 value = t
             ).encodeToByteArray()
         )

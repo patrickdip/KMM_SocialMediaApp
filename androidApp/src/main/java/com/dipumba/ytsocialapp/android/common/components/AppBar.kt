@@ -21,35 +21,21 @@ import com.ramcosta.composedestinations.utils.currentDestinationAsState
 
 @Composable
 fun AppBar(
-    modifier: Modifier,
-    navController: NavHostController
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController
 ) {
-    val currentDestination = navController.currentDestinationAsState().value
+    val currentDestination = navHostController.currentDestinationAsState().value
 
     Surface(
         modifier = modifier,
         elevation = SmallElevation
     ) {
         TopAppBar(
+            title = {
+                Text(text = stringResource(id = getAppBarTitle(currentDestination?.route)))
+            },
             modifier = modifier,
             backgroundColor = MaterialTheme.colors.surface,
-            title = {
-                Text(
-                    text = stringResource(id = getAppBarTitle(currentDestination?.route)),
-                    style = MaterialTheme.typography.h6
-                )
-            },
-            navigationIcon = if (shouldShowNavIcon(currentDestination?.route)) {
-                {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.round_arrow_back_24),
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.onSurface
-                        )
-                    }
-                }
-            } else null,
             actions = {
                 AnimatedVisibility(visible = currentDestination?.route == HomeScreenDestination.route) {
                     IconButton(onClick = { /*TODO*/ }) {
@@ -59,23 +45,47 @@ fun AppBar(
                         )
                     }
                 }
+            },
+            navigationIcon = if (shouldShowNavigationIcon(currentDestination?.route)) {
+                {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.round_arrow_back),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }else {
+                null
             }
         )
     }
 }
 
-private fun shouldShowNavIcon(destinationRoute: String?): Boolean {
-    return when (destinationRoute) {
-        LoginDestination.route -> false
-        else -> false
-    }
-}
-
-private fun getAppBarTitle(destinationRoute: String?): Int {
-    return when (destinationRoute) {
+private fun getAppBarTitle(currentDestinationRoute: String?): Int {
+    return when (currentDestinationRoute) {
         LoginDestination.route -> R.string.login_destination_title
         SignUpDestination.route -> R.string.signup_destination_title
-        HomeScreenDestination.route -> R.string.app_name
+        HomeScreenDestination.route -> R.string.home_destination_title
         else -> R.string.no_destination_title
     }
 }
+
+private fun shouldShowNavigationIcon(currentDestinationRoute: String?): Boolean {
+    return false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

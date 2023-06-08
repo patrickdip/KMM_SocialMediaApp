@@ -4,8 +4,8 @@ import com.dipumba.ytsocialapp.auth.domain.model.AuthResultData
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserPreferences(
-    val id: Int = 0,
+data class UserSettings(
+    val id: Int = -1,
     val name: String = "",
     val bio: String = "",
     val avatar: String? = null,
@@ -14,14 +14,12 @@ data class UserPreferences(
     val followingCount: Int = 0
 )
 
-fun AuthResultData.toUserPreferences(): UserPreferences{
-    return UserPreferences(
-        id, name, bio, avatar, token, followersCount, followingCount
-    )
+fun UserSettings.toAuthResultData(): AuthResultData{
+    return AuthResultData(id, name, bio, avatar, token, followersCount, followingCount)
 }
 
-fun UserPreferences.toAuthResultData(): AuthResultData{
-    return AuthResultData(
+fun AuthResultData.toUserSettings(): UserSettings{
+    return UserSettings(
         id, name, bio, avatar, token, followersCount, followingCount
     )
 }

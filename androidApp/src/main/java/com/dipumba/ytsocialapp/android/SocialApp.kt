@@ -37,7 +37,7 @@ fun SocialApp(
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            AppBar(modifier = Modifier, navController = navHostController)
+            AppBar(modifier = Modifier, navHostController = navHostController)
         }
     ) {innerPaddings ->
         DestinationsNavHost(
