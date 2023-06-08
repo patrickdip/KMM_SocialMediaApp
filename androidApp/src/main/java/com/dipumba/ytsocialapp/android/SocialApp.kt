@@ -1,33 +1,37 @@
 package com.dipumba.ytsocialapp.android
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.dipumba.ytsocialapp.android.common.components.AppBar
 import com.dipumba.ytsocialapp.android.destinations.HomeScreenDestination
 import com.dipumba.ytsocialapp.android.destinations.LoginDestination
-import com.dipumba.ytsocialapp.auth.domain.model.AuthResultData
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 
 @Composable
 fun SocialApp(
-    authState: AuthResultData?
+    token: String?
 ) {
     val navHostController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
+    val systemUiController = rememberSystemUiController()
 
-    LaunchedEffect(key1 = authState){
-        if (authState != null && authState.token.isBlank()){
-            navHostController.navigate(LoginDestination.route){
-                popUpTo(HomeScreenDestination.route){
-                    inclusive = true
-                }
-            }
-        }
+    val isSystemInDark = isSystemInDarkTheme()
+    val statusBarColor = if (isSystemInDark){
+        MaterialTheme.colors.surface
+    }else{
+        MaterialTheme.colors.surface.copy(alpha = 0.95f)
+    }
+    SideEffect {
+        systemUiController.setStatusBarColor(color = statusBarColor, darkIcons = !isSystemInDark)
     }
 
     Scaffold(
@@ -42,4 +46,14 @@ fun SocialApp(
             navController = navHostController
         )
     }
+
+    LaunchedEffect(key1 = token, block = {
+        if (token != null && token.isEmpty()){
+            navHostController.navigate(LoginDestination.route){
+                popUpTo(HomeScreenDestination.route){
+                    inclusive = true
+                }
+            }
+        }
+    })
 }

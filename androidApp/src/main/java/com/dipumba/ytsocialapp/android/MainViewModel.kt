@@ -10,5 +10,5 @@ class MainViewModel(
     private val dataStore: DataStore<UserPreferences>
 ): ViewModel() {
 
-    val authState = dataStore.data.map { it.toAuthResultData() }
+    val authState = dataStore.data.map { it.toAuthResultData().token }
 }
