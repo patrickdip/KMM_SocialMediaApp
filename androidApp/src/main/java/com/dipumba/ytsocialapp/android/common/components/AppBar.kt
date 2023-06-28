@@ -14,8 +14,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.dipumba.ytsocialapp.android.R
 import com.dipumba.ytsocialapp.android.common.theming.SmallElevation
-import com.dipumba.ytsocialapp.android.destinations.HomeScreenDestination
+import com.dipumba.ytsocialapp.android.destinations.HomeDestination
 import com.dipumba.ytsocialapp.android.destinations.LoginDestination
+import com.dipumba.ytsocialapp.android.destinations.PostDetailDestination
+import com.dipumba.ytsocialapp.android.destinations.ProfileDestination
 import com.dipumba.ytsocialapp.android.destinations.SignUpDestination
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 
@@ -37,7 +39,7 @@ fun AppBar(
             modifier = modifier,
             backgroundColor = MaterialTheme.colors.surface,
             actions = {
-                AnimatedVisibility(visible = currentDestination?.route == HomeScreenDestination.route) {
+                AnimatedVisibility(visible = currentDestination?.route == HomeDestination.route) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.person_circle_icon),
@@ -48,14 +50,14 @@ fun AppBar(
             },
             navigationIcon = if (shouldShowNavigationIcon(currentDestination?.route)) {
                 {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { navHostController.navigateUp() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.round_arrow_back),
                             contentDescription = null
                         )
                     }
                 }
-            }else {
+            } else {
                 null
             }
         )
@@ -66,13 +68,19 @@ private fun getAppBarTitle(currentDestinationRoute: String?): Int {
     return when (currentDestinationRoute) {
         LoginDestination.route -> R.string.login_destination_title
         SignUpDestination.route -> R.string.signup_destination_title
-        HomeScreenDestination.route -> R.string.home_destination_title
+        HomeDestination.route -> R.string.home_destination_title
+        ProfileDestination.route -> R.string.profile_destination_title
+        PostDetailDestination.route -> R.string.post_detail_destination_title
         else -> R.string.no_destination_title
     }
 }
 
 private fun shouldShowNavigationIcon(currentDestinationRoute: String?): Boolean {
-    return false
+    return !(currentDestinationRoute == LoginDestination.route
+            || currentDestinationRoute == SignUpDestination.route
+            || currentDestinationRoute == HomeDestination.route
+            || currentDestinationRoute == null
+            )
 }
 
 

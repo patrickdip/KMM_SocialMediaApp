@@ -1,7 +1,7 @@
 package com.dipumba.ytsocialapp.android.auth.signup
 
 import androidx.compose.runtime.Composable
-import com.dipumba.ytsocialapp.android.destinations.HomeScreenDestination
+import com.dipumba.ytsocialapp.android.destinations.HomeDestination
 import com.dipumba.ytsocialapp.android.destinations.LoginDestination
 import com.dipumba.ytsocialapp.android.destinations.SignUpDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -27,7 +27,7 @@ fun SignUp(
             }
         },
         onNavigateToHome = {
-            navigator.navigate(HomeScreenDestination){
+            navigator.navigate(HomeDestination){
                 popUpTo(SignUpDestination.route){inclusive = true}
             }
         },

@@ -11,7 +11,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.dipumba.ytsocialapp.android.common.components.AppBar
-import com.dipumba.ytsocialapp.android.destinations.HomeScreenDestination
+import com.dipumba.ytsocialapp.android.destinations.HomeDestination
 import com.dipumba.ytsocialapp.android.destinations.LoginDestination
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -31,7 +31,10 @@ fun SocialApp(
         MaterialTheme.colors.surface.copy(alpha = 0.95f)
     }
     SideEffect {
-        systemUiController.setStatusBarColor(color = statusBarColor, darkIcons = !isSystemInDark)
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = !isSystemInDark
+        )
     }
 
     Scaffold(
@@ -50,7 +53,7 @@ fun SocialApp(
     LaunchedEffect(key1 = token, block = {
         if (token != null && token.isEmpty()){
             navHostController.navigate(LoginDestination.route){
-                popUpTo(HomeScreenDestination.route){
+                popUpTo(HomeDestination.route){
                     inclusive = true
                 }
             }

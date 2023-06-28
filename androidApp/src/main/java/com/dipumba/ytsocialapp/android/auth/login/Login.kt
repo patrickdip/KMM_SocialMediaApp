@@ -1,7 +1,7 @@
 package com.dipumba.ytsocialapp.android.auth.login
 
 import androidx.compose.runtime.Composable
-import com.dipumba.ytsocialapp.android.destinations.HomeScreenDestination
+import com.dipumba.ytsocialapp.android.destinations.HomeDestination
 import com.dipumba.ytsocialapp.android.destinations.LoginDestination
 import com.dipumba.ytsocialapp.android.destinations.SignUpDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -20,7 +20,7 @@ fun Login(
         onPasswordChange = viewModel::updatePassword,
         onSignInClick = viewModel::signIn,
         onNavigateToHome = {
-            navigator.navigate(HomeScreenDestination){
+            navigator.navigate(HomeDestination){
                 popUpTo(LoginDestination.route){inclusive = true}
             }
         },
