@@ -31,7 +31,10 @@ fun SocialApp(
         MaterialTheme.colors.surface.copy(alpha = 0.95f)
     }
     SideEffect {
-        systemUiController.setStatusBarColor(color = statusBarColor, darkIcons = !isSystemInDark)
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = !isSystemInDark
+        )
     }
 
     Scaffold(

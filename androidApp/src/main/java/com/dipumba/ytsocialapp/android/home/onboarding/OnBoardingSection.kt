@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,19 +22,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.dipumba.ytsocialapp.android.R
-import com.dipumba.ytsocialapp.android.common.fake_data.FollowsUser
-import com.dipumba.ytsocialapp.android.common.fake_data.sampleUsers
+import com.dipumba.ytsocialapp.android.common.dummy_data.FollowsUser
+import com.dipumba.ytsocialapp.android.common.dummy_data.sampleUsers
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.MediumSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SocialAppTheme
 
+
 @Composable
 fun OnBoardingSection(
-    modifier: Modifier = Modifier,
     users: List<FollowsUser>,
     onUserClick: (FollowsUser) -> Unit,
     onFollowButtonClick: (Boolean, FollowsUser) -> Unit,
-    onBoardingFinish: () -> Unit
+    onBoardingFinish: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -49,7 +50,7 @@ fun OnBoardingSection(
         )
 
         Text(
-            text = stringResource(id = R.string.onboarding_description),
+            text = stringResource(id = R.string.oboarding_guidance_subtitle),
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = LargeSpacing),
@@ -57,7 +58,7 @@ fun OnBoardingSection(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = modifier.heightIn(LargeSpacing))
+        Spacer(modifier = modifier.height(LargeSpacing))
 
         UsersRow(
             users = users,
@@ -67,20 +68,19 @@ fun OnBoardingSection(
 
         OutlinedButton(
             onClick = onBoardingFinish,
+            shape = RoundedCornerShape(percent = 50),
             modifier = modifier
                 .fillMaxWidth(fraction = 0.5f)
                 .align(Alignment.CenterHorizontally)
-                .padding(vertical = LargeSpacing),
-            shape = RoundedCornerShape(percent = 50)
+                .padding(vertical = LargeSpacing)
         ) {
-            Text(text = stringResource(id = R.string.onboarding_done_button))
+            Text(text = stringResource(id = R.string.onboarding_button_text))
         }
     }
 }
 
-
 @Composable
-fun UsersRow(
+private fun UsersRow(
     modifier: Modifier = Modifier,
     users: List<FollowsUser>,
     onUserClick: (FollowsUser) -> Unit,
@@ -90,8 +90,8 @@ fun UsersRow(
         horizontalArrangement = Arrangement.spacedBy(LargeSpacing),
         contentPadding = PaddingValues(horizontal = LargeSpacing),
         modifier = modifier
-    ){
-        items(items = users, key = {followUser -> followUser.id}){
+    ) {
+        items(items = users, key = { user -> user.id }) {
             OnBoardingUserItem(
                 followsUser = it,
                 onUserClick = onUserClick,
@@ -100,8 +100,6 @@ fun UsersRow(
         }
     }
 }
-
-
 
 
 @Preview(uiMode = UI_MODE_NIGHT_YES)
@@ -133,7 +131,3 @@ private fun UsersRowPreview() {
         }
     }
 }
-
-
-
-

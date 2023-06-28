@@ -13,21 +13,21 @@ import com.dipumba.ytsocialapp.android.R
 
 @Composable
 fun CircleImage(
-    modifier: Modifier = Modifier,
-    imageUrl: String?,
+    modifier: Modifier,
+    url: String,
     onClick: () -> Unit
 ) {
     AsyncImage(
-        model = imageUrl,
+        model = url,
         contentDescription = null,
         modifier = modifier
             .clip(CircleShape)
             .clickable { onClick() },
-        placeholder = if (MaterialTheme.colors.isLight){
+        placeholder = if (MaterialTheme.colors.isLight) {
             painterResource(id = R.drawable.light_image_place_holder)
-        }else{
+        } else {
             painterResource(id = R.drawable.dark_image_place_holder)
         },
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
     )
 }

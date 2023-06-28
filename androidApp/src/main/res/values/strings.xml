@@ -9,8 +9,18 @@
     <string name="signup_destination_title">SignUp</string>
     <string name="no_destination_title" />
     <string name="home_destination_title">Social App</string>
-    <string name="follow_button_text">Follow</string>
-    <string name="onboarding_title">Who to follow</string>
-    <string name="onboarding_description">Post from people you follow will appear here.\nHere are some suggested people you can follow</string>
-    <string name="onboarding_done_button">Done</string>
+    <string name="follow_text_label">Follow</string>
+    <string name="onboarding_title">Welcome to Social App</string>
+    <string name="oboarding_guidance_subtitle">Posts from people you follow will appear here. Follow some people to get started.</string>
+    <string name="onboarding_button_text">Done</string>
+    <string name="trending_posts_title">Trending Posts</string>
+    <string name="followers_text">" Followers"</string>
+    <string name="following_text">" Following"</string>
+    <string name="posts_label">Posts:</string>
+    <string name="profile_destination_title">Profile</string>
+    <string name="post_detail_destination_title">Post detail</string>
+    <string name="comments_label">Comments</string>
+    <string name="add_comment_button_label">Add comment</string>
+    <string name="loading_error_message">Ooops, error!</string>
+    <string name="retry_button_text">Retry</string>
 </resources>

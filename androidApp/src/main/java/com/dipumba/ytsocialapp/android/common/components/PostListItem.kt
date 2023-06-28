@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.dipumba.ytsocialapp.android.R
-import com.dipumba.ytsocialapp.android.common.fake_data.Post
-import com.dipumba.ytsocialapp.android.common.fake_data.samplePosts
+import com.dipumba.ytsocialapp.android.common.dummy_data.Post
+import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
 import com.dipumba.ytsocialapp.android.common.theming.DarkGray
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.LightGray
@@ -46,8 +46,8 @@ fun PostListItem(
     post: Post,
     onPostClick: (Post) -> Unit,
     onProfileClick: (Int) -> Unit,
-    onLikeClick: () -> Unit,
-    onCommentClick: () -> Unit,
+    onLikeClick: (String) -> Unit,
+    onCommentClick: (String) -> Unit,
     isDetailScreen: Boolean = false
 ) {
     Column(
@@ -57,11 +57,15 @@ fun PostListItem(
             .background(color = MaterialTheme.colors.surface)
             .clickable { onPostClick(post) }
     ) {
-        PostItemHeader(
+        PostHeader(
             name = post.authorName,
             profileUrl = post.authorImage,
             date = post.createdAt,
-            onProfileClick = {onProfileClick(post.authorId)}
+            onProfileClick = {
+                onProfileClick(
+                    post.authorId
+                )
+            }
         )
 
         AsyncImage(
@@ -71,30 +75,25 @@ fun PostListItem(
                 .fillMaxWidth()
                 .aspectRatio(ratio = 1.0f),
             contentScale = ContentScale.Crop,
-            placeholder = if (MaterialTheme.colors.isLight){
+            placeholder = if (MaterialTheme.colors.isLight) {
                 painterResource(id = R.drawable.light_image_place_holder)
-            }else{
+            } else {
                 painterResource(id = R.drawable.dark_image_place_holder)
             }
         )
 
-
         PostLikesRow(
             likesCount = post.likesCount,
-            commentsCount = post.commentCount,
-            onLikeClick = onLikeClick,
-            onCommentClick = onCommentClick
+            commentCount = post.commentCount,
+            onLikeClick = { onLikeClick(post.id) },
+            onCommentClick = { onCommentClick(post.id) }
         )
 
         Text(
             text = post.text,
             style = MaterialTheme.typography.body2,
             modifier = modifier.padding(horizontal = LargeSpacing),
-            maxLines = if (isDetailScreen){
-                20
-            }else{
-                2
-            },
+            maxLines = if (isDetailScreen) 10 else 2,
             overflow = TextOverflow.Ellipsis
         )
     }
@@ -102,7 +101,7 @@ fun PostListItem(
 
 
 @Composable
-fun PostItemHeader(
+fun PostHeader(
     modifier: Modifier = Modifier,
     name: String,
     profileUrl: String,
@@ -119,10 +118,11 @@ fun PostItemHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MediumSpacing)
     ) {
-
-        CircleImage(imageUrl = profileUrl, modifier = modifier.size(30.dp)) {
-            onProfileClick()
-        }
+        CircleImage(
+            modifier = modifier.size(30.dp),
+            url = profileUrl,
+            onClick = onProfileClick
+        )
 
         Text(
             text = name,
@@ -130,27 +130,27 @@ fun PostItemHeader(
             color = MaterialTheme.colors.onSurface
         )
 
-        Box(modifier = modifier
-            .size(4.dp)
-            .clip(CircleShape)
-            .background(
-                color = if (MaterialTheme.colors.isLight) {
-                    LightGray
-                } else {
-                    DarkGray
-                }
-            )
+        Box(
+            modifier = modifier
+                .size(4.dp)
+                .clip(CircleShape)
+                .background(
+                    color = if (MaterialTheme.colors.isLight) {
+                        LightGray
+                    } else {
+                        DarkGray
+                    }
+                )
         )
-
 
         Text(
             text = date,
             style = MaterialTheme.typography.caption.copy(
                 textAlign = TextAlign.Start,
                 fontSize = 12.sp,
-                color = if (MaterialTheme.colors.isLight){
+                color = if (MaterialTheme.colors.isLight) {
                     LightGray
-                }else{
+                } else {
                     DarkGray
                 }
             ),
@@ -158,11 +158,11 @@ fun PostItemHeader(
         )
 
         Icon(
-            painter = painterResource(id = R.drawable.round_more_horiz_24),
+            painter = painterResource(id = R.drawable.round_more_horizontal),
             contentDescription = null,
-            tint = if (MaterialTheme.colors.isLight){
+            tint = if (MaterialTheme.colors.isLight) {
                 LightGray
-            }else{
+            } else {
                 DarkGray
             }
         )
@@ -174,7 +174,7 @@ fun PostItemHeader(
 fun PostLikesRow(
     modifier: Modifier = Modifier,
     likesCount: Int,
-    commentsCount: Int,
+    commentCount: Int,
     onLikeClick: () -> Unit,
     onCommentClick: () -> Unit
 ) {
@@ -187,13 +187,15 @@ fun PostLikesRow(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onLikeClick) {
+        IconButton(
+            onClick = onLikeClick
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.like_icon_outlined),
                 contentDescription = null,
-                tint = if (MaterialTheme.colors.isLight){
+                tint = if (MaterialTheme.colors.isLight) {
                     LightGray
-                }else{
+                } else {
                     DarkGray
                 }
             )
@@ -201,34 +203,31 @@ fun PostLikesRow(
 
         Text(
             text = "$likesCount",
-            style = MaterialTheme.typography.subtitle2.copy(
-                fontSize = 18.sp
-            )
+            style = MaterialTheme.typography.subtitle2.copy(fontSize = 18.sp)
         )
 
         Spacer(modifier = modifier.width(MediumSpacing))
 
-        IconButton(onClick = onCommentClick) {
+        IconButton(
+            onClick = onCommentClick
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.chat_icon_outlined),
                 contentDescription = null,
-                tint = if (MaterialTheme.colors.isLight){
+                tint = if (MaterialTheme.colors.isLight) {
                     LightGray
-                }else{
+                } else {
                     DarkGray
                 }
             )
         }
 
         Text(
-            text = "$commentsCount",
-            style = MaterialTheme.typography.subtitle2.copy(
-                fontSize = 18.sp
-            )
+            text = "$commentCount",
+            style = MaterialTheme.typography.subtitle2.copy(fontSize = 18.sp)
         )
     }
 }
-
 
 
 @Preview(uiMode = UI_MODE_NIGHT_YES)
@@ -252,7 +251,7 @@ private fun PostListItemPreview() {
 private fun PostHeaderPreview() {
     SocialAppTheme {
         Surface(color = MaterialTheme.colors.surface) {
-            PostItemHeader(
+            PostHeader(
                 name = "Mr Dip",
                 profileUrl = "",
                 date = "20 min",
@@ -270,15 +269,10 @@ private fun PostLikesRowPreview() {
         Surface(color = MaterialTheme.colors.surface) {
             PostLikesRow(
                 likesCount = 12,
-                commentsCount = 2,
+                commentCount = 2,
                 onLikeClick = {},
                 onCommentClick = {}
             )
         }
     }
 }
-
-
-
-
-
