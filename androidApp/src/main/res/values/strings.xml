@@ -9,4 +9,8 @@
     <string name="signup_destination_title">SignUp</string>
     <string name="no_destination_title" />
     <string name="home_destination_title">Social App</string>
+    <string name="follow_button_text">Follow</string>
+    <string name="onboarding_title">Who to follow</string>
+    <string name="onboarding_description">Post from people you follow will appear here.\nHere are some suggested people you can follow</string>
+    <string name="onboarding_done_button">Done</string>
 </resources>
