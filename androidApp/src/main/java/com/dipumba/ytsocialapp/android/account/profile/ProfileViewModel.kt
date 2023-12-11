@@ -12,14 +12,17 @@ import com.dipumba.ytsocialapp.android.common.dummy_data.sampleProfiles
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ProfileViewModel : ViewModel() {
+
+class ProfileViewModel : ViewModel(){
+
     var userInfoUiState by mutableStateOf(UserInfoUiState())
         private set
 
     var profilePostsUiState by mutableStateOf(ProfilePostsUiState())
         private set
 
-    fun fetchProfile(userId: Int) {
+
+    fun fetchProfile(userId: Int){
         viewModelScope.launch {
             delay(1000)
 
@@ -36,15 +39,14 @@ class ProfileViewModel : ViewModel() {
     }
 }
 
-
 data class UserInfoUiState(
     val isLoading: Boolean = true,
     val profile: Profile? = null,
-    val errorMessage: String? = null
+    var errorMessage: String? = null
 )
 
 data class ProfilePostsUiState(
     val isLoading: Boolean = true,
     val posts: List<Post> = listOf(),
-    val errorMessage: String? = null
+    var errorMessage: String? = null
 )

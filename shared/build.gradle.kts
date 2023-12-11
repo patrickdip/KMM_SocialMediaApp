@@ -3,17 +3,18 @@ plugins {
     id("com.android.library")
 
     //Kotlinx Serialization
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 kotlin {
-    android {
+    androidTarget {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "17"
             }
         }
     }
+    jvmToolchain(17)
     
     listOf(
         iosX64(),

@@ -18,7 +18,7 @@ fun Home(
         onUserClick = {},
         onFollowButtonClick = { _, _ -> },
         onPostClick = {post -> navigator.navigate(PostDetailDestination(post.id)) },
-        onProfileClick = { userId -> navigator.navigate(ProfileDestination(userId = userId)) },
+        onProfileClick = { navigator.navigate(ProfileDestination(it))},
         onLikeClick = {},
         onCommentClick = {},
         refreshData = {viewModel.fetchData()},
