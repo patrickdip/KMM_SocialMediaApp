@@ -6,6 +6,27 @@ This repository contains the client-side code for the Social Media App built usi
 
 **Please Note:** This project is a work in progress. Currently, only the Android UI has been implemented. The iOS part will be developed after the server and Android components are fully completed.
 
+## Some Design Screenshots 📸
+
+## Android UI
+<table>
+  <tr>
+    <td><img src="https://github.com/patrickdip/KMM_SocialMediaApp/assets/76696960/a275e349-8db9-407a-ae27-0c890ba0a42e" alt="Android UI Home" /></td>
+    <td><img src="https://github.com/patrickdip/KMM_SocialMediaApp/assets/76696960/b0058f1c-3a84-4b60-acb8-d193074b650f" alt="Android UI Profile" /></td>
+    <td><img src="https://github.com/patrickdip/KMM_SocialMediaApp/assets/76696960/ffff521a-a8f8-460f-b159-a10d05c787d8" alt="Android UI Post Detail" /></td>
+  </tr>
+</table>
+
+## iOS UI
+<table>
+  <tr>
+    <td><img src="https://github.com/patrickdip/KMM_SocialMediaApp/assets/76696960/c0c2456a-02ab-4bc7-af72-1445b0afe389" alt="iOS UI Home" /></td>
+    <td><img src="https://github.com/patrickdip/KMM_SocialMediaApp/assets/76696960/c87c0dcd-5eec-43d7-8988-9afd563cf66e" alt="iOS UI Profile" /></td>
+    <td><img src="https://github.com/patrickdip/KMM_SocialMediaApp/assets/76696960/b959120b-a118-41f2-a3b8-8d9c4c46adb1" alt="iOS UI Post Detail" /></td>
+  </tr>
+</table>
+
+
 ## Getting Started 🚀
 
 ### What you need
