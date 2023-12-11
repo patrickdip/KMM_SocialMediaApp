@@ -43,9 +43,10 @@ fun HomeScreen(
     refreshData: () -> Unit,
     onBoardingFinish: () -> Unit
 ) {
+
     val pullRefreshState = rememberPullRefreshState(
         refreshing = onBoardingUiState.isLoading && homePostsUiState.isLoading,
-        onRefresh = refreshData
+        onRefresh = { refreshData() }
     )
 
     Box(
