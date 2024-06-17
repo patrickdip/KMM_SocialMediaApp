@@ -24,11 +24,12 @@ import androidx.compose.ui.unit.dp
 import com.dipumba.ytsocialapp.android.R
 import com.dipumba.ytsocialapp.android.common.components.CircleImage
 import com.dipumba.ytsocialapp.android.common.components.FollowsButton
-import com.dipumba.ytsocialapp.android.common.dummy_data.FollowsUser
 import com.dipumba.ytsocialapp.android.common.dummy_data.sampleUsers
 import com.dipumba.ytsocialapp.android.common.theming.MediumSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SmallSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SocialAppTheme
+import com.dipumba.ytsocialapp.android.common.util.toCurrentUrl
+import com.dipumba.ytsocialapp.common.domain.model.FollowsUser
 
 @Composable
 fun OnBoardingUserItem(
@@ -55,7 +56,7 @@ fun OnBoardingUserItem(
         ) {
             CircleImage(
                 modifier = modifier.size(50.dp),
-                url = followsUser.profileUrl,
+                url = followsUser.imageUrl?.toCurrentUrl(),
                 onClick = {}
             )
 
@@ -71,12 +72,14 @@ fun OnBoardingUserItem(
             Spacer(modifier = modifier.height(MediumSpacing))
 
             FollowsButton(
-                text = R.string.follow_text_label,
+                text = if (!followsUser.isFollowing) {
+                    R.string.follow_text_label
+                } else R.string.unfollow_text_label,
                 onClick = { onFollowButtonClick(!isFollowing, followsUser) },
                 modifier = modifier
                     .heightIn(30.dp)
                     .widthIn(100.dp),
-                isOutlined = isFollowing
+                isOutlined = followsUser.isFollowing
             )
         }
     }
@@ -87,7 +90,7 @@ fun OnBoardingUserItem(
 private fun OnBoardingUserPreview() {
     SocialAppTheme {
         OnBoardingUserItem(
-            followsUser = sampleUsers.first(),
+            followsUser = sampleUsers.first().toFollowsUser(),
             onUserClick = {},
             onFollowButtonClick = { _, _ -> })
     }

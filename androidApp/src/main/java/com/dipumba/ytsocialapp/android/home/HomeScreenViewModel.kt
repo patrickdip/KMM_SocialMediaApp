@@ -1,24 +1,44 @@
 package com.dipumba.ytsocialapp.android.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dipumba.ytsocialapp.android.common.dummy_data.FollowsUser
-import com.dipumba.ytsocialapp.android.common.dummy_data.Post
+import com.dipumba.ytsocialapp.android.common.dummy_data.SamplePost
 import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
-import com.dipumba.ytsocialapp.android.common.dummy_data.sampleUsers
+import com.dipumba.ytsocialapp.android.common.util.Constants
+import com.dipumba.ytsocialapp.android.common.util.DefaultPagingManager
+import com.dipumba.ytsocialapp.android.common.util.PagingManager
+import com.dipumba.ytsocialapp.common.domain.model.FollowsUser
+import com.dipumba.ytsocialapp.common.domain.model.Post
+import com.dipumba.ytsocialapp.common.util.Result
+import com.dipumba.ytsocialapp.follows.domain.usecase.FollowOrUnfollowUseCase
+import com.dipumba.ytsocialapp.follows.domain.usecase.GetFollowableUsersUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.GetPostsUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrUnlikePostUseCase
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class HomeScreenViewModel: ViewModel() {
+class HomeScreenViewModel(
+    private val getFollowableUsersUseCase: GetFollowableUsersUseCase,
+    private val followOrUnfollowUseCase: FollowOrUnfollowUseCase,
+    private val getPostsUseCase: GetPostsUseCase,
+    private val likePostUseCase: LikeOrUnlikePostUseCase
+): ViewModel() {
 
     var onBoardingUiState by mutableStateOf(OnBoardingUiState())
         private set
 
-    var homePostsUiState by mutableStateOf(HomePostsUiState())
+    var postsFeedUiState by mutableStateOf(PostsFeedUiState())
         private set
+
+    var homeRefreshState by mutableStateOf(HomeRefreshState())
+        private set
+
+    private val pagingManager by lazy { createPagingManager() }
 
 
     init {
@@ -26,36 +46,191 @@ class HomeScreenViewModel: ViewModel() {
     }
 
 
-    fun fetchData(){
-        onBoardingUiState = onBoardingUiState.copy(isLoading = true)
-        homePostsUiState = homePostsUiState.copy(isLoading = true)
+    private fun fetchData(){
+        homeRefreshState = homeRefreshState.copy(isRefreshing = true)
 
         viewModelScope.launch {
             delay(1000)
 
+            val onboardingDeferred = async {
+                getFollowableUsersUseCase()
+            }
+
+            pagingManager.apply {
+                reset()
+                loadItems()
+            }
+            handleOnBoardingResult(onboardingDeferred.await())
+            homeRefreshState = homeRefreshState.copy(isRefreshing = false)
+        }
+    }
+
+    private fun createPagingManager(): PagingManager<Post>{
+        return DefaultPagingManager(
+            onRequest = {page ->
+                getPostsUseCase(page, Constants.DEFAULT_REQUEST_PAGE_SIZE)
+            },
+            onSuccess = {posts, page ->
+                postsFeedUiState = if (posts.isEmpty()){
+                    postsFeedUiState.copy(endReached = true)
+                }else{
+                    if (page == Constants.INITIAL_PAGE_NUMBER){
+                        postsFeedUiState = postsFeedUiState.copy(posts = emptyList())
+                    }
+                    postsFeedUiState.copy(
+                        posts = postsFeedUiState.posts + posts,
+                        endReached = posts.size < Constants.DEFAULT_REQUEST_PAGE_SIZE
+                    )
+                }
+            },
+            onError = {cause, page ->
+                if (page == Constants.INITIAL_PAGE_NUMBER){
+                    homeRefreshState = homeRefreshState.copy(
+                        refreshErrorMessage = cause
+                    )
+                }else{
+                    postsFeedUiState = postsFeedUiState.copy(
+                        loadingErrorMessage = cause
+                    )
+                }
+            },
+            onLoadStateChange = {isLoading ->
+                postsFeedUiState = postsFeedUiState.copy(
+                    isLoading = isLoading
+                )
+            }
+        )
+    }
+
+    private fun loadMorePosts() {
+        if (postsFeedUiState.endReached) return
+        viewModelScope.launch {
+            pagingManager.loadItems()
+        }
+    }
+
+    private fun handleOnBoardingResult(result: Result<List<FollowsUser>>) {
+        when (result) {
+            is Result.Error -> Unit
+
+            is Result.Success -> {
+                result.data?.let { followsUsers ->
+                    onBoardingUiState = onBoardingUiState.copy(
+                        shouldShowOnBoarding = followsUsers.isNotEmpty(),
+                        followableUsers = followsUsers
+                    )
+                }
+            }
+        }
+    }
+
+    private fun followUser(followsUser: FollowsUser) {
+        viewModelScope.launch {
+            val result = followOrUnfollowUseCase(
+                followedUserId = followsUser.id,
+                shouldFollow = !followsUser.isFollowing
+            )
+
             onBoardingUiState = onBoardingUiState.copy(
-                isLoading = false,
-                followableUsers = sampleUsers,
-                shouldShowOnBoarding = true
+                followableUsers = onBoardingUiState.followableUsers.map {
+                    if (it.id == followsUser.id) {
+                        it.copy(isFollowing = !followsUser.isFollowing)
+                    } else it
+                }
             )
-            homePostsUiState = homePostsUiState.copy(
-                isLoading = false,
-                posts = samplePosts
+
+            when (result) {
+                is Result.Error -> {
+                    onBoardingUiState = onBoardingUiState.copy(
+                        followableUsers = onBoardingUiState.followableUsers.map {
+                            if (it.id == followsUser.id) {
+                                it.copy(isFollowing = followsUser.isFollowing)
+                            } else it
+                        }
+                    )
+                }
+
+                is Result.Success -> Unit
+            }
+        }
+    }
+
+    private fun dismissOnboarding() {
+        val hasFollowing = onBoardingUiState.followableUsers.any { it.isFollowing }
+        if (!hasFollowing) {
+            //TODO tell the user they need to follow at least one person
+        } else {
+            onBoardingUiState =
+                onBoardingUiState.copy(shouldShowOnBoarding = false, followableUsers = emptyList())
+            fetchData()
+        }
+    }
+
+    private fun likeOrUnlikePost(post: Post) {
+        viewModelScope.launch {
+            val count = if (post.isLiked) -1 else +1
+            postsFeedUiState = postsFeedUiState.copy(
+                posts = postsFeedUiState.posts.map {
+                    if (it.postId == post.postId) {
+                        it.copy(
+                            isLiked = !post.isLiked,
+                            likesCount = post.likesCount.plus(count)
+                        )
+                    } else it
+                }
             )
+
+            val result = likePostUseCase(
+                post = post,
+            )
+
+            when (result) {
+                is Result.Error -> {
+                    postsFeedUiState = postsFeedUiState.copy(
+                        posts = postsFeedUiState.posts.map {
+                            if (it.postId == post.postId) post else it
+                        }
+                    )
+                }
+
+                is Result.Success -> Unit
+            }
+        }
+    }
+
+    fun onUiAction(uiAction: HomeUiAction) {
+        when (uiAction) {
+            is HomeUiAction.FollowUserAction -> followUser(uiAction.user)
+            HomeUiAction.LoadMorePostsAction -> loadMorePosts()
+            is HomeUiAction.PostLikeAction -> likeOrUnlikePost(uiAction.post)
+            HomeUiAction.RefreshAction -> fetchData()
+            HomeUiAction.RemoveOnboardingAction -> dismissOnboarding()
         }
     }
 
 }
 
-data class OnBoardingUiState(
-    val shouldShowOnBoarding: Boolean = false,
-    val isLoading: Boolean = false,
-    val followableUsers: List<FollowsUser> = listOf(),
-    val loadingErrorMessage: String? = null
+data class HomeRefreshState(
+    val isRefreshing: Boolean = false,
+    val refreshErrorMessage: String? = null
 )
 
-data class HomePostsUiState(
+data class OnBoardingUiState(
+    val shouldShowOnBoarding: Boolean = false,
+    val followableUsers: List<FollowsUser> = listOf()
+)
+
+data class PostsFeedUiState(
     val isLoading: Boolean = false,
     val posts: List<Post> = listOf(),
-    val loadingErrorMessage: String? = null
+    val loadingErrorMessage: String? = null,
+    val endReached: Boolean = false
 )
+
+sealed interface HomeUiAction {
+    data class FollowUserAction(val user: FollowsUser) : HomeUiAction
+    data class PostLikeAction(val post: Post) : HomeUiAction
+    data object RemoveOnboardingAction : HomeUiAction
+    data object RefreshAction : HomeUiAction
+    data object LoadMorePostsAction : HomeUiAction
+}

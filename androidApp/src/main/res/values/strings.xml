@@ -10,6 +10,7 @@
     <string name="no_destination_title" />
     <string name="home_destination_title">Social App</string>
     <string name="follow_text_label">Follow</string>
+    <string name="unfollow_text_label">Unfollow</string>
     <string name="onboarding_title">Welcome to Social App</string>
     <string name="oboarding_guidance_subtitle">Posts from people you follow will appear here. Follow some people to get started.</string>
     <string name="onboarding_button_text">Done</string>

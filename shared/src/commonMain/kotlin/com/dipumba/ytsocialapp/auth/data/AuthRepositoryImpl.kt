@@ -2,13 +2,16 @@ package com.dipumba.ytsocialapp.auth.data
 
 import com.dipumba.ytsocialapp.auth.domain.model.AuthResultData
 import com.dipumba.ytsocialapp.auth.domain.repository.AuthRepository
+import com.dipumba.ytsocialapp.common.data.local.UserPreferences
+import com.dipumba.ytsocialapp.common.data.local.toUserSettings
 import com.dipumba.ytsocialapp.common.util.DispatcherProvider
 import com.dipumba.ytsocialapp.common.util.Result
 import kotlinx.coroutines.withContext
 
 internal class AuthRepositoryImpl(
     private val dispatcher: DispatcherProvider,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val userPreferences: UserPreferences
 ) : AuthRepository {
     override suspend fun signUp(
         name: String,
@@ -26,6 +29,9 @@ internal class AuthRepositoryImpl(
                         message = authResponse.errorMessage!!
                     )
                 }else{
+                    userPreferences.setUserData(
+                        authResponse.data.toAuthResultData().toUserSettings()
+                    )
                     Result.Success(
                         data = authResponse.data.toAuthResultData()
                     )
@@ -50,6 +56,9 @@ internal class AuthRepositoryImpl(
                         message = authResponse.errorMessage!!
                     )
                 }else{
+                    userPreferences.setUserData(
+                        authResponse.data.toAuthResultData().toUserSettings()
+                    )
                     Result.Success(
                         data = authResponse.data.toAuthResultData()
                     )

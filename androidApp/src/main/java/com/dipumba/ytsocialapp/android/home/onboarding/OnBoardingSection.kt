@@ -22,11 +22,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.dipumba.ytsocialapp.android.R
-import com.dipumba.ytsocialapp.android.common.dummy_data.FollowsUser
 import com.dipumba.ytsocialapp.android.common.dummy_data.sampleUsers
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.MediumSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SocialAppTheme
+import com.dipumba.ytsocialapp.common.domain.model.FollowsUser
 
 
 @Composable
@@ -108,7 +108,7 @@ private fun OnBoardingSectionPreview() {
     SocialAppTheme {
         Surface(color = MaterialTheme.colors.background) {
             OnBoardingSection(
-                users = sampleUsers,
+                users = sampleUsers.map { it.toFollowsUser() },
                 onUserClick = {},
                 onFollowButtonClick = { _, _ -> },
                 onBoardingFinish = {}
@@ -123,7 +123,7 @@ private fun UsersRowPreview() {
     SocialAppTheme {
         Surface(color = MaterialTheme.colors.background) {
             UsersRow(
-                users = sampleUsers,
+                users = sampleUsers.map { it.toFollowsUser() },
                 onUserClick = {},
                 onFollowButtonClick = { _, _ -> },
                 modifier = Modifier.padding(vertical = LargeSpacing)

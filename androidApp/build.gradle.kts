@@ -8,11 +8,11 @@ plugins {
 
 android {
     namespace = "com.dipumba.ytsocialapp.android"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.dipumba.ytsocialapp.android"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
@@ -60,8 +60,6 @@ dependencies {
     ksp("io.github.raamcosta.compose-destinations:ksp:1.8.38-beta")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
-
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("io.insert-koin:koin-androidx-compose:3.4.1")
 
