@@ -1,6 +1,6 @@
 package com.dipumba.ytsocialapp.auth.data
 
-import com.dipumba.ytsocialapp.common.data.KtorApi
+import com.dipumba.ytsocialapp.common.data.remote.KtorApi
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

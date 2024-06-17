@@ -1,4 +1,4 @@
-package com.dipumba.ytsocialapp.android.common.datastore
+package com.dipumba.ytsocialapp.common.data.local
 
 import com.dipumba.ytsocialapp.auth.domain.model.AuthResultData
 import kotlinx.serialization.Serializable
@@ -18,7 +18,7 @@ fun UserSettings.toAuthResultData(): AuthResultData{
     return AuthResultData(id, name, bio, avatar, token, followersCount, followingCount)
 }
 
-fun AuthResultData.toUserSettings(): UserSettings{
+fun AuthResultData.toUserSettings(): UserSettings {
     return UserSettings(
         id, name, bio, avatar, token, followersCount, followingCount
     )

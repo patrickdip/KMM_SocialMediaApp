@@ -1,6 +1,9 @@
 package com.dipumba.ytsocialapp.android.common.dummy_data
 
-data class Post(
+import com.dipumba.ytsocialapp.common.domain.model.Post
+import com.dipumba.ytsocialapp.common.util.DateFormatter
+
+data class SamplePost(
     val id: String,
     val text: String,
     val imageUrl: String,
@@ -12,11 +15,27 @@ data class Post(
     val authorImage: String,
     val isLiked: Boolean = false,
     val isOwnPost: Boolean = false
-)
+){
+    fun toDomainPost(): Post {
+        return Post(
+            postId = id.toLong(),
+            caption = text,
+            imageUrl = imageUrl,
+            createdAt = DateFormatter.parseDate(createdAt),
+            likesCount = likesCount,
+            commentsCount = commentCount,
+            userId = authorId.toLong(),
+            userName = authorName,
+            userImageUrl = authorImage,
+            isLiked = isLiked,
+            isOwnPost = isOwnPost
+        )
+    }
+}
 
 
 val samplePosts = listOf(
-    Post(
+    SamplePost(
         id = "11",
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         imageUrl = "https://picsum.photos/400",
@@ -27,7 +46,7 @@ val samplePosts = listOf(
         authorName = "Mr Dip",
         authorImage = "https://picsum.photos/200"
     ),
-    Post(
+    SamplePost(
         id = "12",
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         imageUrl = "https://picsum.photos/400",
@@ -38,7 +57,7 @@ val samplePosts = listOf(
         authorName = "John Cena",
         authorImage = "https://picsum.photos/200"
     ),
-    Post(
+    SamplePost(
         id = "13",
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         imageUrl = "https://picsum.photos/400",
@@ -49,7 +68,7 @@ val samplePosts = listOf(
         authorName = "Cristiano",
         authorImage = "https://picsum.photos/200"
     ),
-    Post(
+    SamplePost(
         id = "14",
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         imageUrl = "https://picsum.photos/400",
@@ -60,7 +79,7 @@ val samplePosts = listOf(
         authorName = "Cristiano",
         authorImage = "https://picsum.photos/200"
     ),
-    Post(
+    SamplePost(
         id = "15",
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         imageUrl = "https://picsum.photos/400",

@@ -39,7 +39,7 @@ import com.dipumba.ytsocialapp.android.R
 import com.dipumba.ytsocialapp.android.common.components.CircleImage
 import com.dipumba.ytsocialapp.android.common.components.FollowsButton
 import com.dipumba.ytsocialapp.android.common.components.PostListItem
-import com.dipumba.ytsocialapp.android.common.dummy_data.Post
+import com.dipumba.ytsocialapp.android.common.dummy_data.SamplePost
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.MediumSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SmallSpacing
@@ -53,7 +53,7 @@ fun ProfileScreen(
     onButtonClick: () -> Unit,
     onFollowersClick: () -> Unit,
     onFollowingClick: () -> Unit,
-    onPostClick: (Post) -> Unit,
+    onPostClick: (SamplePost) -> Unit,
     onLikeClick: (String) -> Unit,
     onCommentClick: (String) -> Unit,
     fetchData: () -> Unit
@@ -85,11 +85,11 @@ fun ProfileScreen(
                 key = {post -> post.id}
             ){
                 PostListItem(
-                    post = it,
-                    onPostClick = onPostClick,
+                    post = it.toDomainPost(),
+                    onPostClick = {},
                     onProfileClick = {},
-                    onLikeClick = onLikeClick,
-                    onCommentClick = onCommentClick
+                    onLikeClick = {},
+                    onCommentClick = {}
                 )
             }
         }

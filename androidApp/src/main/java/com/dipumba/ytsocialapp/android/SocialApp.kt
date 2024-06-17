@@ -18,7 +18,7 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 
 @Composable
 fun SocialApp(
-    token: String?
+    uiState: MainActivityUiState
 ) {
     val navHostController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
@@ -50,13 +50,18 @@ fun SocialApp(
         )
     }
 
-    LaunchedEffect(key1 = token, block = {
-        if (token != null && token.isEmpty()){
-            navHostController.navigate(LoginDestination.route){
-                popUpTo(HomeDestination.route){
-                    inclusive = true
+    when(uiState){
+        MainActivityUiState.Loading -> {}
+        is MainActivityUiState.Success -> {
+            LaunchedEffect(key1 = Unit) {
+                if (uiState.currentUser.token.isEmpty()) {
+                    navHostController.navigate(LoginDestination.route) {
+                        popUpTo(HomeDestination.route) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }
-    })
+    }
 }

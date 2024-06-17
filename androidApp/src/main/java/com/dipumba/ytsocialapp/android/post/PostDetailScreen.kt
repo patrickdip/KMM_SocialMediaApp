@@ -52,7 +52,7 @@ fun PostDetailScreen(
         ) {
             item(key = "post") {
                 PostListItem(
-                    post = postUiState.post,
+                    post = postUiState.post.toDomainPost(),
                     onPostClick = {},
                     onProfileClick = {},
                     onLikeClick = {},

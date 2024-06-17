@@ -1,39 +1,23 @@
 package com.dipumba.ytsocialapp.android.di
 
-import androidx.datastore.core.DataStoreFactory
-import androidx.datastore.dataStoreFile
 import com.dipumba.ytsocialapp.android.MainActivityViewModel
 import com.dipumba.ytsocialapp.android.account.edit.EditProfileViewModel
 import com.dipumba.ytsocialapp.android.account.follows.FollowsViewModel
 import com.dipumba.ytsocialapp.android.account.profile.ProfileViewModel
 import com.dipumba.ytsocialapp.android.auth.login.LoginViewModel
 import com.dipumba.ytsocialapp.android.auth.signup.SignUpViewModel
-import com.dipumba.ytsocialapp.android.common.datastore.UserSettingsSerializer
 import com.dipumba.ytsocialapp.android.home.HomeScreenViewModel
 import com.dipumba.ytsocialapp.android.post.PostDetailViewModel
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    viewModel { LoginViewModel(get(), get()) }
-    viewModel { SignUpViewModel(get(), get()) }
+    viewModel { LoginViewModel(get()) }
+    viewModel { SignUpViewModel(get()) }
     viewModel { MainActivityViewModel(get())}
-    viewModel { HomeScreenViewModel()}
+    viewModel { HomeScreenViewModel(get(), get(), get(), get())}
     viewModel { PostDetailViewModel()}
     viewModel { ProfileViewModel() }
     viewModel { EditProfileViewModel() }
     viewModel { FollowsViewModel() }
-
-
-    single {
-        DataStoreFactory.create(
-            serializer = UserSettingsSerializer,
-            produceFile = {
-                androidContext().dataStoreFile(
-                    fileName = "app_user_settings"
-                )
-            }
-        )
-    }
 }

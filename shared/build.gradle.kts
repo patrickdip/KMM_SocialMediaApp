@@ -7,6 +7,7 @@ plugins {
 }
 
 kotlin {
+    task("testClasses")
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -30,6 +31,7 @@ kotlin {
     val coroutinesVersion = "1.6.4"
     val koinVersion = "3.3.2"
     val ktorVersion = "2.2.1"
+    val datastoreVersion = "1.1.1"
 
     sourceSets {
         val commonMain by getting {
@@ -40,6 +42,9 @@ kotlin {
                 api("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
                 api("io.insert-koin:koin-core:$koinVersion")
+
+                implementation("androidx.datastore:datastore-preferences-core:$datastoreVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
             }
         }
 
@@ -55,6 +60,8 @@ kotlin {
             dependencies {
                 api("io.insert-koin:koin-android:$koinVersion")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
+
+                api("androidx.datastore:datastore-preferences:$datastoreVersion")
             }
         }
 
@@ -89,9 +96,8 @@ kotlin {
 
 android {
     namespace = "com.dipumba.ytsocialapp"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         minSdk = 24
-        targetSdk = 33
     }
 }

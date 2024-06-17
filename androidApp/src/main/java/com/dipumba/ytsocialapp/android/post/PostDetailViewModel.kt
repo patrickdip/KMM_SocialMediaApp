@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dipumba.ytsocialapp.android.common.dummy_data.Comment
-import com.dipumba.ytsocialapp.android.common.dummy_data.Post
+import com.dipumba.ytsocialapp.android.common.dummy_data.SamplePost
 import com.dipumba.ytsocialapp.android.common.dummy_data.sampleComments
 import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
 import kotlinx.coroutines.delay
@@ -41,7 +41,7 @@ class PostDetailViewModel: ViewModel() {
 
 data class PostUiState(
     val isLoading: Boolean = false,
-    val post: Post? = null,
+    val post: SamplePost? = null,
     val errorMessage: String? = null
 )
 

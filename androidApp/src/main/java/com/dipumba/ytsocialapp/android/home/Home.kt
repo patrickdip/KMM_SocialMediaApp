@@ -15,15 +15,11 @@ fun Home(
     val viewModel: HomeScreenViewModel = koinViewModel()
 
     HomeScreen(
-        onUserClick = {},
-        onFollowButtonClick = { _, _ -> },
-        onPostClick = {post -> navigator.navigate(PostDetailDestination(post.id)) },
-        onProfileClick = { navigator.navigate(ProfileDestination(it))},
-        onLikeClick = {},
-        onCommentClick = {},
-        refreshData = {viewModel.fetchData()},
         onBoardingUiState = viewModel.onBoardingUiState,
-        homePostsUiState = viewModel.homePostsUiState,
-        onBoardingFinish = {}
+        postsFeedUiState = viewModel.postsFeedUiState,
+        homeRefreshState = viewModel.homeRefreshState,
+        onUiAction = {viewModel.onUiAction(it)},
+        onProfileNavigation = {navigator.navigate(ProfileDestination(it.toInt()))},
+        onPostDetailNavigation = {navigator.navigate(PostDetailDestination(it.postId.toString()))}
     )
 }

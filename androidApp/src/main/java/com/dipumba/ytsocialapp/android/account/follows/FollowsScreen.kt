@@ -23,14 +23,14 @@ fun FollowsScreen(
         LazyColumn(
             modifier = modifier.fillMaxSize()
         ){
-            items(items = uiState.followsUsers, key = {user -> user.id}){
+            items(items = uiState.sampleFollowsUsers, key = { user -> user.id}){
                 FollowsListItem(name = it.name, bio = it.bio, imageUrl = it.profileUrl) {
                     onItemClick(it.id)
                 }
             }
         }
 
-        if (uiState.isLoading && uiState.followsUsers.isEmpty()){
+        if (uiState.isLoading && uiState.sampleFollowsUsers.isEmpty()){
             CircularProgressIndicator()
         }
     }
