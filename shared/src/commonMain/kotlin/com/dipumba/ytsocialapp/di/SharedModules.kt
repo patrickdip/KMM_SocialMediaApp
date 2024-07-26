@@ -1,5 +1,9 @@
 package com.dipumba.ytsocialapp.di
 
+import com.dipumba.ytsocialapp.account.data.AccountApiService
+import com.dipumba.ytsocialapp.account.data.repository.ProfileRepositoryImpl
+import com.dipumba.ytsocialapp.account.domain.repository.ProfileRepository
+import com.dipumba.ytsocialapp.account.domain.usecase.GetProfileUseCase
 import com.dipumba.ytsocialapp.auth.data.AuthRepositoryImpl
 import com.dipumba.ytsocialapp.auth.data.AuthService
 import com.dipumba.ytsocialapp.auth.domain.repository.AuthRepository
@@ -15,7 +19,8 @@ import com.dipumba.ytsocialapp.follows.domain.usecase.GetFollowableUsersUseCase
 import com.dipumba.ytsocialapp.post.data.PostRepositoryImpl
 import com.dipumba.ytsocialapp.post.domain.PostRepository
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostsUseCase
-import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrUnlikePostUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.GetUserPostsUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrDislikePostUseCase
 import org.koin.dsl.module
 
 private val authModule = module {
@@ -32,7 +37,8 @@ private val utilityModule = module {
 private val postModule = module {
     factory { PostApiService() }
     factory { GetPostsUseCase() }
-    factory { LikeOrUnlikePostUseCase() }
+    factory { LikeOrDislikePostUseCase() }
+    factory { GetUserPostsUseCase() }
 
     single<PostRepository> { PostRepositoryImpl(get(), get(), get()) }
 }
@@ -45,10 +51,17 @@ private val followsModule = module {
     single<FollowsRepository> { FollowsRepositoryImpl(get(), get(), get()) }
 }
 
+private val accountModule = module {
+    factory { AccountApiService() }
+    factory { GetProfileUseCase() }
+    single<ProfileRepository> { ProfileRepositoryImpl(get(), get(), get()) }
+}
+
 fun getSharedModules() = listOf(
     platformModule,
     authModule,
     utilityModule,
     postModule,
-    followsModule
+    followsModule,
+    accountModule
 )

@@ -15,7 +15,7 @@ fun FollowsScreen(
     modifier: Modifier = Modifier,
     uiState: FollowsUiState,
     fetchFollows: () -> Unit,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Long) -> Unit
 ) {
 
 
@@ -23,8 +23,8 @@ fun FollowsScreen(
         LazyColumn(
             modifier = modifier.fillMaxSize()
         ){
-            items(items = uiState.sampleFollowsUsers, key = { user -> user.id}){
-                FollowsListItem(name = it.name, bio = it.bio, imageUrl = it.profileUrl) {
+            items(items = uiState.sampleFollowsUsers.map { it.toFollowsUser() }, key = { user -> user.id}){
+                FollowsListItem(name = it.name, bio = it.bio, imageUrl = it.imageUrl ?:"") {
                     onItemClick(it.id)
                 }
             }

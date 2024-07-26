@@ -15,7 +15,7 @@ class FollowsViewModel : ViewModel(){
     var uiState by mutableStateOf(FollowsUiState())
         private set
 
-    fun fetchFollows(userId: Int, followsType: Int){
+    fun fetchFollows(userId: Long, followsType: Int){
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
 

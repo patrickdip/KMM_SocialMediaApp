@@ -1,7 +1,9 @@
 package com.dipumba.ytsocialapp.post.data
 
 import com.dipumba.ytsocialapp.common.data.local.UserPreferences
+import com.dipumba.ytsocialapp.common.data.local.UserSettings
 import com.dipumba.ytsocialapp.common.data.model.LikeParams
+import com.dipumba.ytsocialapp.common.data.model.PostsApiResponse
 import com.dipumba.ytsocialapp.common.data.remote.PostApiService
 import com.dipumba.ytsocialapp.common.domain.model.Post
 import com.dipumba.ytsocialapp.common.util.Constants
@@ -18,42 +20,19 @@ internal class PostRepositoryImpl(
     private val dispatcher: DispatcherProvider
 ) : PostRepository {
     override suspend fun getFeedPosts(page: Int, pageSize: Int): Result<List<Post>> {
-        return withContext(dispatcher.io) {
-            try {
-                val userData = userPreferences.getUserData()
-                val apiResponse = postApiService.getFeedPosts(
-                    userToken = userData.token,
-                    currentUserId = userData.id,
+        return fetchPosts(
+            apiCall = { currentUserData ->
+                postApiService.getFeedPosts(
+                    userToken = currentUserData.token,
+                    currentUserId = currentUserData.id,
                     page = page,
                     pageSize = pageSize
                 )
-
-                when (apiResponse.code) {
-                    HttpStatusCode.OK -> {
-                        Result.Success(data = apiResponse.data.posts.map { it.toDomainPost() })
-                    }
-
-                    HttpStatusCode.BadRequest -> {
-                        //Here you should format the message to make it understandable
-                        //instead of passing what we get from the server (used for debugging)
-                        Result.Error(message = "Error: ${apiResponse.data.message}")
-                    }
-
-                    else -> {
-                        Result.Error(message = Constants.UNEXPECTED_ERROR)
-                    }
-                }
-            } catch (ioException: IOException) {
-                Result.Error(message = Constants.NO_INTERNET_ERROR)
-            } catch (exception: Throwable) {
-                Result.Error(
-                    message = "${exception.cause}"
-                )
             }
-        }
+        )
     }
 
-    override suspend fun likeOrUnlikePost(postId: Long, shouldLike: Boolean): Result<Boolean> {
+    override suspend fun likeOrDislikePost(postId: Long, shouldLike: Boolean): Result<Boolean> {
         return withContext(dispatcher.io) {
             try {
                 val userData = userPreferences.getUserData()
@@ -62,7 +41,7 @@ internal class PostRepositoryImpl(
                 val apiResponse = if (shouldLike){
                     postApiService.likePost(userData.token, likeParams)
                 }else{
-                    postApiService.unlikePost(userData.token, likeParams)
+                    postApiService.dislikePost(userData.token, likeParams)
                 }
 
                 if (apiResponse.code == HttpStatusCode.OK) {
@@ -76,6 +55,44 @@ internal class PostRepositoryImpl(
                 Result.Error(
                     message = "${exception.message}"
                 )
+            }
+        }
+    }
+
+    override suspend fun getUserPosts(userId: Long, page: Int, pageSize: Int): Result<List<Post>> {
+        return fetchPosts(
+            apiCall = { currentUserData ->
+                postApiService.getUserPosts(
+                    token = currentUserData.token,
+                    userId = userId,
+                    currentUserId = currentUserData.id,
+                    page = page,
+                    pageSize = pageSize
+                )
+            }
+        )
+    }
+
+    private suspend fun fetchPosts(
+        apiCall: suspend (UserSettings) -> PostsApiResponse
+    ): Result<List<Post>>{
+        return withContext(dispatcher.io){
+            try {
+                val currentUserData = userPreferences.getUserData()
+                val apiResponse = apiCall(currentUserData)
+
+                when (apiResponse.code) {
+                    HttpStatusCode.OK -> {
+                        Result.Success(data = apiResponse.data.posts.map { it.toDomainPost() })
+                    }
+                    else -> {
+                        Result.Error(message = Constants.UNEXPECTED_ERROR)
+                    }
+                }
+            }catch (ioException: IOException) {
+                Result.Error(message = Constants.NO_INTERNET_ERROR)
+            } catch (exception: Throwable) {
+                Result.Error(message = "${exception.cause}")
             }
         }
     }

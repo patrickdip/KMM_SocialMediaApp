@@ -11,7 +11,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 @Destination
 fun Profile(
-    userId: Int,
+    userId: Long,
     navigator: DestinationsNavigator
 ) {
 
@@ -20,12 +20,19 @@ fun Profile(
     ProfileScreen(
         userInfoUiState = viewModel.userInfoUiState,
         profilePostsUiState = viewModel.profilePostsUiState,
-        onButtonClick = { navigator.navigate(EditProfileDestination(userId)) },
-        onFollowersClick = { navigator.navigate(FollowersDestination(userId))},
-        onFollowingClick = { navigator.navigate(FollowingDestination(userId))},
-        onPostClick = {},
-        onLikeClick = {},
-        onCommentClick = {},
-        fetchData = { viewModel.fetchProfile(userId)}
+        profileId = userId,
+        onUiAction = viewModel::onUiAction,
+        onFollowButtonClick = {
+            viewModel.userInfoUiState.profile?.let { profile ->
+                if (profile.isOwnProfile) {
+                    navigator.navigate(EditProfileDestination(userId))
+                } else {
+                    viewModel.onUiAction(ProfileUiAction.FollowUserAction(profile = profile))
+                }
+            }
+        },
+        onFollowersScreenNavigation = { navigator.navigate(FollowersDestination(userId)) },
+        onFollowingScreenNavigation = { navigator.navigate(FollowingDestination(userId)) },
+        onPostDetailNavigation = {}
     )
 }

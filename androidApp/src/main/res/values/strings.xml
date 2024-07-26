@@ -28,4 +28,5 @@
     <string name="upload_changes_text">Upload changes</string>
     <string name="could_not_load_profile">Oops, we could not load your profile!</string>
     <string name="edit_profile_destination_title">Edit profile</string>
+    <string name="edit_profile_label">Edit profile</string>
 </resources>

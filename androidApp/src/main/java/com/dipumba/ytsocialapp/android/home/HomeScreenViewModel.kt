@@ -1,15 +1,14 @@
 package com.dipumba.ytsocialapp.android.home
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dipumba.ytsocialapp.android.common.dummy_data.SamplePost
-import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
 import com.dipumba.ytsocialapp.android.common.util.Constants
 import com.dipumba.ytsocialapp.android.common.util.DefaultPagingManager
+import com.dipumba.ytsocialapp.android.common.util.Event
+import com.dipumba.ytsocialapp.android.common.util.EventBus
 import com.dipumba.ytsocialapp.android.common.util.PagingManager
 import com.dipumba.ytsocialapp.common.domain.model.FollowsUser
 import com.dipumba.ytsocialapp.common.domain.model.Post
@@ -17,16 +16,18 @@ import com.dipumba.ytsocialapp.common.util.Result
 import com.dipumba.ytsocialapp.follows.domain.usecase.FollowOrUnfollowUseCase
 import com.dipumba.ytsocialapp.follows.domain.usecase.GetFollowableUsersUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostsUseCase
-import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrUnlikePostUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrDislikePostUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class HomeScreenViewModel(
     private val getFollowableUsersUseCase: GetFollowableUsersUseCase,
     private val followOrUnfollowUseCase: FollowOrUnfollowUseCase,
     private val getPostsUseCase: GetPostsUseCase,
-    private val likePostUseCase: LikeOrUnlikePostUseCase
+    private val likePostUseCase: LikeOrDislikePostUseCase
 ): ViewModel() {
 
     var onBoardingUiState by mutableStateOf(OnBoardingUiState())
@@ -43,6 +44,13 @@ class HomeScreenViewModel(
 
     init {
         fetchData()
+
+        EventBus.events
+            .onEach {
+                when (it) {
+                    is Event.PostUpdated -> updatePost(it.post)
+                }
+            }.launchIn(viewModelScope)
     }
 
 
@@ -186,16 +194,20 @@ class HomeScreenViewModel(
 
             when (result) {
                 is Result.Error -> {
-                    postsFeedUiState = postsFeedUiState.copy(
-                        posts = postsFeedUiState.posts.map {
-                            if (it.postId == post.postId) post else it
-                        }
-                    )
+                    updatePost(post)
                 }
 
                 is Result.Success -> Unit
             }
         }
+    }
+
+    private fun updatePost(post: Post) {
+        postsFeedUiState = postsFeedUiState.copy(
+            posts = postsFeedUiState.posts.map {
+                if (it.postId == post.postId) post else it
+            }
+        )
     }
 
     fun onUiAction(uiAction: HomeUiAction) {
