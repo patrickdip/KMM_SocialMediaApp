@@ -17,10 +17,17 @@ import com.dipumba.ytsocialapp.follows.domain.FollowsRepository
 import com.dipumba.ytsocialapp.follows.domain.usecase.FollowOrUnfollowUseCase
 import com.dipumba.ytsocialapp.follows.domain.usecase.GetFollowableUsersUseCase
 import com.dipumba.ytsocialapp.post.data.PostRepositoryImpl
-import com.dipumba.ytsocialapp.post.domain.PostRepository
+import com.dipumba.ytsocialapp.post.data.remote.PostCommentsApiService
+import com.dipumba.ytsocialapp.post.data.repository.PostCommentsRepositoryImpl
+import com.dipumba.ytsocialapp.post.domain.repository.PostCommentsRepository
+import com.dipumba.ytsocialapp.post.domain.repository.PostRepository
+import com.dipumba.ytsocialapp.post.domain.usecase.AddPostCommentUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.GetPostCommentsUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.GetPostUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostsUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetUserPostsUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrDislikePostUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.RemovePostCommentUseCase
 import org.koin.dsl.module
 
 private val authModule = module {
@@ -39,8 +46,18 @@ private val postModule = module {
     factory { GetPostsUseCase() }
     factory { LikeOrDislikePostUseCase() }
     factory { GetUserPostsUseCase() }
+    factory { GetPostUseCase() }
 
     single<PostRepository> { PostRepositoryImpl(get(), get(), get()) }
+}
+
+private val postCommentModule = module {
+    factory { PostCommentsApiService() }
+    factory { GetPostCommentsUseCase() }
+    factory { AddPostCommentUseCase() }
+    factory { RemovePostCommentUseCase() }
+
+    single<PostCommentsRepository> { PostCommentsRepositoryImpl(get(), get(), get()) }
 }
 
 private val followsModule = module {
@@ -63,5 +80,6 @@ fun getSharedModules() = listOf(
     utilityModule,
     postModule,
     followsModule,
-    accountModule
+    accountModule,
+    postCommentModule
 )

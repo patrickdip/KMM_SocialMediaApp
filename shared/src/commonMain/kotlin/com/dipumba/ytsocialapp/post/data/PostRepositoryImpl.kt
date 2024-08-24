@@ -9,7 +9,7 @@ import com.dipumba.ytsocialapp.common.domain.model.Post
 import com.dipumba.ytsocialapp.common.util.Constants
 import com.dipumba.ytsocialapp.common.util.DispatcherProvider
 import com.dipumba.ytsocialapp.common.util.Result
-import com.dipumba.ytsocialapp.post.domain.PostRepository
+import com.dipumba.ytsocialapp.post.domain.repository.PostRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.withContext
@@ -93,6 +93,30 @@ internal class PostRepositoryImpl(
                 Result.Error(message = Constants.NO_INTERNET_ERROR)
             } catch (exception: Throwable) {
                 Result.Error(message = "${exception.cause}")
+            }
+        }
+    }
+
+    override suspend fun getPost(postId: Long): Result<Post> {
+        return withContext(dispatcher.io){
+            try {
+                val userData = userPreferences.getUserData()
+
+                val apiResponse = postApiService.getPost(
+                    token = userData.token,
+                    currentUserId = userData.id,
+                    postId = postId
+                )
+
+                if (apiResponse.code == HttpStatusCode.OK){
+                    Result.Success(data = apiResponse.data.post!!.toDomainPost())
+                }else{
+                    Result.Error(message = apiResponse.data.message!!)
+                }
+            }catch (ioException: IOException){
+                Result.Error(message = Constants.NO_INTERNET_ERROR)
+            }catch (exception: Throwable){
+                Result.Error(message = Constants.UNEXPECTED_ERROR)
             }
         }
     }

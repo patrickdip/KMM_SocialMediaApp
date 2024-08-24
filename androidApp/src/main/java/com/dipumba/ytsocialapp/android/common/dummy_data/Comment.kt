@@ -1,5 +1,7 @@
 package com.dipumba.ytsocialapp.android.common.dummy_data
 
+import com.dipumba.ytsocialapp.post.domain.model.PostComment
+
 data class Comment(
     val id: String,
     val comment: String,
@@ -7,8 +9,20 @@ data class Comment(
     val authorName: String,
     val authorImageUrl: String,
     val authorId: Int,
-    val postId: String
-)
+    val postId: Long
+){
+    fun toDomainComment(): PostComment {
+        return PostComment(
+            commentId = id.hashCode().toLong(),
+            content = comment,
+            createdAt = date,
+            postId = postId,
+            userId = authorId.toLong(),
+            userName = authorName,
+            userImageUrl = authorImageUrl
+        )
+    }
+}
 
 val sampleComments = listOf(
     Comment(
@@ -18,7 +32,7 @@ val sampleComments = listOf(
         authorName = sampleUsers[0].name,
         authorImageUrl = sampleUsers[0].profileUrl,
         authorId = sampleUsers[0].id,
-        postId = samplePosts[0].id
+        postId = samplePosts[0].id.hashCode().toLong()
     ),
     Comment(
         id = "comment2",
@@ -27,7 +41,7 @@ val sampleComments = listOf(
         authorName = sampleUsers[1].name,
         authorImageUrl = sampleUsers[1].profileUrl,
         authorId = sampleUsers[1].id,
-        postId = samplePosts[0].id
+        postId = samplePosts[0].id.hashCode().toLong()
     ),
     Comment(
         id = "comment3",
@@ -36,7 +50,7 @@ val sampleComments = listOf(
         authorName = sampleUsers[2].name,
         authorImageUrl = sampleUsers[2].profileUrl,
         authorId = sampleUsers[2].id,
-        postId = samplePosts[0].id
+        postId = samplePosts[0].id.hashCode().toLong()
     ),
     Comment(
         id = "comment4",
@@ -45,6 +59,6 @@ val sampleComments = listOf(
         authorName = sampleUsers[3].name,
         authorImageUrl = sampleUsers[3].profileUrl,
         authorId = sampleUsers[3].id,
-        postId = samplePosts[0].id
+        postId = samplePosts[0].id.hashCode().toLong()
     )
 )

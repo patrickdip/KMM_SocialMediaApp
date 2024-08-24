@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -18,6 +19,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,16 +32,34 @@ import com.dipumba.ytsocialapp.android.common.components.PostListItem
 import com.dipumba.ytsocialapp.android.common.dummy_data.sampleComments
 import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
+import com.dipumba.ytsocialapp.android.common.theming.MediumSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SocialAppTheme
+import com.dipumba.ytsocialapp.android.common.util.Constants
 
 @Composable
 fun PostDetailScreen(
     modifier: Modifier = Modifier,
     postUiState: PostUiState,
     commentsUiState: CommentsUiState,
-    fetchData: () -> Unit
+    postId: Long,
+    onUiAction: (PostDetailUiAction) -> Unit
 ) {
-    if (postUiState.isLoading && commentsUiState.isLoading) {
+    val listState = rememberLazyListState()
+
+    val shouldFetchMoreComments by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                (lastVisibleItem.index + 1 == layoutInfo.totalItemsCount)
+            }
+        }
+    }
+
+    if (postUiState.isLoading) {
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -48,14 +70,15 @@ fun PostDetailScreen(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .background(color = MaterialTheme.colors.surface)
+                .background(color = MaterialTheme.colors.surface),
+            state = listState
         ) {
             item(key = "post") {
                 PostListItem(
-                    post = postUiState.post.toDomainPost(),
+                    post = postUiState.post,
                     onPostClick = {},
                     onProfileClick = {},
-                    onLikeClick = {},
+                    onLikeClick = { onUiAction(PostDetailUiAction.LikeOrDislikePostAction(it))},
                     onCommentClick = {},
                     isDetailScreen = true
                 )
@@ -68,8 +91,8 @@ fun PostDetailScreen(
             }
 
             items(
-                items = sampleComments,
-                key = { comment -> comment.id }
+                items = commentsUiState.comments,
+                key = { comment -> comment.commentId }
             ) {
                 Divider()
                 CommentListItem(
@@ -77,6 +100,22 @@ fun PostDetailScreen(
                     onProfileClick = {},
                     onMoreIconClick = {}
                 )
+            }
+
+            if(commentsUiState.isLoading){
+                item(key = Constants.LOADING_MORE_ITEM_KEY) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical = MediumSpacing,
+                                horizontal = LargeSpacing
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
     }else{
@@ -86,7 +125,7 @@ fun PostDetailScreen(
                     text = stringResource(id = R.string.loading_error_message),
                     style = MaterialTheme.typography.caption
                 )
-                OutlinedButton(onClick = fetchData) {
+                OutlinedButton(onClick = { onUiAction(PostDetailUiAction.FetchPostAction(postId)) }) {
                     Text(text = stringResource(id = R.string.retry_button_text))
                 }
             }
@@ -94,7 +133,13 @@ fun PostDetailScreen(
     }
 
     LaunchedEffect(key1 = Unit) {
-        fetchData()
+        onUiAction(PostDetailUiAction.FetchPostAction(postId))
+    }
+
+    LaunchedEffect(key1 = shouldFetchMoreComments) {
+        if (shouldFetchMoreComments && !commentsUiState.endReached) {
+            onUiAction(PostDetailUiAction.LoadMoreCommentsAction)
+        }
     }
 }
 
@@ -131,13 +176,14 @@ fun PostDetailPreview() {
             PostDetailScreen(
                 postUiState = PostUiState(
                     isLoading = false,
-                    post = samplePosts.first()
+                    post = samplePosts.first().toDomainPost()
                 ),
                 commentsUiState = CommentsUiState(
                     isLoading = false,
-                    comments = sampleComments
+                    comments = sampleComments.map { it.toDomainComment() }
                 ),
-                fetchData = {}
+                postId = 1,
+                onUiAction = {}
             )
         }
     }
