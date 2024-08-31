@@ -35,7 +35,11 @@ internal class PostCommentsRepositoryImpl(
                 )
 
                 if (apiResponse.code == HttpStatusCode.OK){
-                    Result.Success(data = apiResponse.data.comments.map { it.toDomainPostComment() })
+                    Result.Success(
+                        data = apiResponse.data.comments.map {
+                            it.toDomainPostComment(isOwner = it.userId == currentUserData.id)
+                        }
+                    )
                 }else{
                     Result.Error(message = apiResponse.data.message ?: Constants.UNEXPECTED_ERROR)
                 }
@@ -63,7 +67,11 @@ internal class PostCommentsRepositoryImpl(
                 )
 
                 if (apiResponse.code == HttpStatusCode.OK){
-                    Result.Success(data = apiResponse.data.comment!!.toDomainPostComment())
+                    Result.Success(
+                        data = apiResponse.data.comment!!.toDomainPostComment(
+                            isOwner = apiResponse.data.comment.userId == currentUserData.id
+                        )
+                    )
                 }else{
                     Result.Error(message = apiResponse.data.message ?: Constants.UNEXPECTED_ERROR)
                 }
@@ -91,7 +99,9 @@ internal class PostCommentsRepositoryImpl(
                 )
 
                 if (apiResponse.code == HttpStatusCode.OK){
-                    val comment = apiResponse.data.comment?.toDomainPostComment()
+                    val comment = apiResponse.data.comment?.toDomainPostComment(
+                        isOwner = apiResponse.data.comment.userId == currentUserData.id
+                    )
                     Result.Success(data = comment)
                 }else{
                     Result.Error(message = apiResponse.data.message ?: Constants.UNEXPECTED_ERROR)

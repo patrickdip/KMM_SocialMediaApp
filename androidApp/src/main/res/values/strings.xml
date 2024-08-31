@@ -29,4 +29,9 @@
     <string name="could_not_load_profile">Oops, we could not load your profile!</string>
     <string name="edit_profile_destination_title">Edit profile</string>
     <string name="edit_profile_label">Edit profile</string>
+    <string name="comment_hint">Add comment</string>
+    <string name="send_button_text">Send</string>
+    <string name="comment_more_actions_title">Comment</string>
+    <string name="delete_comment_action">Delete comment</string>
+    <string name="view_profile_action">View 1%s profile</string>
 </resources>

@@ -7,5 +7,6 @@ data class PostComment(
     val userId: Long,
     val userName: String,
     val userImageUrl: String?,
-    val createdAt: String
+    val createdAt: String,
+    val isOwner: Boolean = false
 )

@@ -33,10 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.dipumba.ytsocialapp.android.R
-import com.dipumba.ytsocialapp.android.common.dummy_data.SamplePost
 import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
-import com.dipumba.ytsocialapp.android.common.theming.Black54
 import com.dipumba.ytsocialapp.android.common.theming.DarkGray
+import com.dipumba.ytsocialapp.android.common.theming.ExtraLargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.LightGray
 import com.dipumba.ytsocialapp.android.common.theming.MediumSpacing
@@ -48,18 +47,25 @@ import com.dipumba.ytsocialapp.common.domain.model.Post
 fun PostListItem(
     modifier: Modifier = Modifier,
     post: Post,
-    onPostClick: (Post) -> Unit,
+    onPostClick: ((Post) -> Unit)? = null,
     onProfileClick: (userId: Long) -> Unit,
     onLikeClick: (Post) -> Unit,
     onCommentClick: (Post) -> Unit,
-    isDetailScreen: Boolean = false
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(ratio = 0.7f)
+            //.aspectRatio(ratio = 0.7f)
             .background(color = MaterialTheme.colors.surface)
-            .clickable { onPostClick(post) }
+            //.clickable { onPostClick(post) }
+            .let { mod ->
+                if (onPostClick != null) {
+                    mod.clickable { onPostClick(post) }.padding(bottom = ExtraLargeSpacing)
+                } else {
+                    mod
+                }
+            }
     ) {
         PostHeader(
             name = post.userName,
@@ -98,7 +104,7 @@ fun PostListItem(
             text = post.caption,
             style = MaterialTheme.typography.body2,
             modifier = modifier.padding(horizontal = LargeSpacing),
-            maxLines = if (isDetailScreen) 10 else 2,
+            maxLines = maxLines,
             overflow = TextOverflow.Ellipsis
         )
     }

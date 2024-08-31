@@ -1,14 +1,11 @@
 package com.dipumba.ytsocialapp.android.post
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dipumba.ytsocialapp.android.common.dummy_data.Comment
-import com.dipumba.ytsocialapp.android.common.dummy_data.SamplePost
-import com.dipumba.ytsocialapp.android.common.dummy_data.sampleComments
-import com.dipumba.ytsocialapp.android.common.dummy_data.samplePosts
 import com.dipumba.ytsocialapp.android.common.util.Constants
 import com.dipumba.ytsocialapp.android.common.util.DefaultPagingManager
 import com.dipumba.ytsocialapp.android.common.util.Event
@@ -17,9 +14,11 @@ import com.dipumba.ytsocialapp.android.common.util.PagingManager
 import com.dipumba.ytsocialapp.common.domain.model.Post
 import com.dipumba.ytsocialapp.common.util.Result
 import com.dipumba.ytsocialapp.post.domain.model.PostComment
+import com.dipumba.ytsocialapp.post.domain.usecase.AddPostCommentUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostCommentsUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrDislikePostUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.RemovePostCommentUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -28,7 +27,9 @@ import kotlinx.coroutines.launch
 class PostDetailViewModel(
     private val getPostUseCase: GetPostUseCase,
     private val getPostCommentsUseCase: GetPostCommentsUseCase,
-    private val likeOrDislikePostUseCase: LikeOrDislikePostUseCase
+    private val likeOrDislikePostUseCase: LikeOrDislikePostUseCase,
+    private val addPostCommentUseCase: AddPostCommentUseCase,
+    private val removePostCommentUseCase: RemovePostCommentUseCase
 ): ViewModel() {
     var postUiState by mutableStateOf(PostUiState())
         private set
@@ -76,6 +77,7 @@ class PostDetailViewModel(
         if (commentsUiState.isLoading || commentsUiState.comments.isNotEmpty()) {
             return
         }
+        Log.d("FetchPostComments", "true")
 
         if (!::pagingManager.isInitialized) {
             pagingManager = createPagingManager(postId = postId)
@@ -84,7 +86,9 @@ class PostDetailViewModel(
     }
 
     private fun loadMoreComments() {
+        Log.d("LoadMoreComments", "false")
         if (commentsUiState.endReached) return
+        Log.d("LoadMoreComments", "true")
         viewModelScope.launch { pagingManager.loadItems() }
     }
 
@@ -147,6 +151,76 @@ class PostDetailViewModel(
         )
     }
 
+    private fun addNewComment(comment: String) {
+        viewModelScope.launch {
+            val post = postUiState.post ?: return@launch
+
+            commentsUiState = commentsUiState.copy(isAddingNewComment = true)
+            delay(500)
+
+            val result = addPostCommentUseCase(
+                postId = post.postId,
+                content = comment
+            )
+
+            when (result) {
+                is Result.Error -> {
+                    commentsUiState = commentsUiState.copy(
+                        errorMessage = result.message,
+                        isAddingNewComment = false
+                    )
+                }
+
+                is Result.Success -> {
+                    val newComment = result.data ?: return@launch
+                    val updatedComments = listOf(newComment) + commentsUiState.comments
+                    commentsUiState = commentsUiState.copy(
+                        comments = updatedComments,
+                        isAddingNewComment = false
+                    )
+
+
+                    val updatedPost = post.copy(
+                        commentsCount = post.commentsCount.plus(1)
+                    )
+                    EventBus.send(Event.PostUpdated(updatedPost))
+                }
+
+            }
+        }
+    }
+
+    private fun removeComment(postComment: PostComment) {
+        viewModelScope.launch {
+            val post = postUiState.post ?: return@launch
+
+            val comments = commentsUiState.comments
+            val updatedComments = comments.filter { it.commentId != postComment.commentId }
+            commentsUiState = commentsUiState.copy(comments = updatedComments)
+
+            val result = removePostCommentUseCase(
+                postId = post.postId,
+                commentId = postComment.commentId
+            )
+
+            when (result) {
+                is Result.Error -> {
+                    commentsUiState = commentsUiState.copy(
+                        errorMessage = result.message,
+                        comments = comments
+                    )
+                }
+
+                is Result.Success -> {
+                    val updatedPost = post.copy(
+                        commentsCount = post.commentsCount.minus(other = 1)
+                    )
+                    EventBus.send(Event.PostUpdated(updatedPost))
+                }
+            }
+        }
+    }
+
     fun onUiAction(action: PostDetailUiAction){
         when(action){
             is PostDetailUiAction.FetchPostAction -> {
@@ -157,6 +231,12 @@ class PostDetailViewModel(
             }
             is PostDetailUiAction.LikeOrDislikePostAction -> {
                 likeOrDislikePost(action.post)
+            }
+            is PostDetailUiAction.AddCommentAction -> {
+                addNewComment(action.comment)
+            }
+            is PostDetailUiAction.RemoveCommentAction -> {
+                removeComment(action.postComment)
             }
         }
     }
@@ -172,11 +252,14 @@ data class CommentsUiState(
     val isLoading: Boolean = false,
     val comments: List<PostComment> = listOf(),
     val errorMessage: String? = null,
-    val endReached: Boolean = false
+    val endReached: Boolean = false,
+    val isAddingNewComment: Boolean = false
 )
 
 sealed interface PostDetailUiAction{
     data class FetchPostAction(val postId: Long): PostDetailUiAction
     data object LoadMoreCommentsAction: PostDetailUiAction
     data class LikeOrDislikePostAction(val post: Post): PostDetailUiAction
+    data class AddCommentAction(val comment: String) : PostDetailUiAction
+    data class RemoveCommentAction(val postComment: PostComment) : PostDetailUiAction
 }

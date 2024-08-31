@@ -1,5 +1,6 @@
 package com.dipumba.ytsocialapp.android.common.util
 
+import android.util.Log
 import com.dipumba.ytsocialapp.common.util.Result
 import kotlinx.coroutines.delay
 
@@ -19,6 +20,7 @@ class DefaultPagingManager<Model>(
     private var isLoading = false
 
     override suspend fun loadItems() {
+        Log.d("PagingManager", "Loading page $currentPage")
         if (isLoading) return
         isLoading = true
         onLoadStateChange(true)
