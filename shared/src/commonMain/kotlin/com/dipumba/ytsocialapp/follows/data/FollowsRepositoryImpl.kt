@@ -7,6 +7,7 @@ import com.dipumba.ytsocialapp.common.domain.model.FollowsUser
 import com.dipumba.ytsocialapp.common.util.Constants
 import com.dipumba.ytsocialapp.common.util.DispatcherProvider
 import com.dipumba.ytsocialapp.common.util.Result
+import com.dipumba.ytsocialapp.common.util.safeApiCall
 import com.dipumba.ytsocialapp.follows.domain.FollowsRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.errors.IOException
@@ -72,6 +73,31 @@ internal class FollowsRepositoryImpl(
                 Result.Error(
                     message = "${exception.message}"
                 )
+            }
+        }
+    }
+
+    override suspend fun getFollows(
+        userId: Long,
+        page: Int,
+        pageSize: Int,
+        followsType: Int
+    ): Result<List<FollowsUser>> {
+        return safeApiCall(dispatcher){
+            val currentUserData = userPreferences.getUserData()
+            val apiResponse = followsApiService.getFollows(
+                userToken = currentUserData.token,
+                userId = userId,
+                page = page,
+                pageSize = pageSize,
+                followsEndPoint = if (followsType == 1) "followers" else "following"
+            )
+
+
+            if (apiResponse.code == HttpStatusCode.OK){
+                Result.Success(data = apiResponse.data.follows.map { it.toDomainFollowUser() })
+            }else{
+                Result.Error(message = "${apiResponse.data.message}")
             }
         }
     }

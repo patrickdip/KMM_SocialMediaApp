@@ -45,6 +45,23 @@ internal class FollowsApiService : KtorApi() {
         }
         return FollowsApiResponse(code = httpResponse.status, data = httpResponse.body())
     }
+
+    suspend fun getFollows(
+        userToken: String,
+        userId: Long,
+        page: Int,
+        pageSize: Int,
+        followsEndPoint: String
+    ): FollowsApiResponse {
+        val httpResponse = client.get {
+            endPoint(path = "/follows/$followsEndPoint")
+            parameter(key = Constants.USER_ID_PARAMETER, value = userId)
+            parameter(key = Constants.PAGE_QUERY_PARAMETER, value = page)
+            parameter(key = Constants.PAGE_SIZE_QUERY_PARAMETER, value = pageSize)
+            setToken(userToken)
+        }
+        return FollowsApiResponse(code = httpResponse.status, data = httpResponse.body())
+    }
 }
 
 

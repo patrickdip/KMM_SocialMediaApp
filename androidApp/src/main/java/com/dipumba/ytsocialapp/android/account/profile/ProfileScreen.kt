@@ -107,15 +107,15 @@ fun ProfileScreen(
             items(
                 items = profilePostsUiState.posts,
                 key = { post -> post.postId }
-            ) {
+            ) { post ->
                 PostListItem(
-                    post = it,
-                    onPostClick = {},
+                    post = post,
+                    onPostClick = { onPostDetailNavigation(it) },
                     onProfileClick = {},
-                    onLikeClick = { post ->
-                        onUiAction(ProfileUiAction.PostLikeAction(post))
+                    onLikeClick = { likedPost ->
+                        onUiAction(ProfileUiAction.PostLikeAction(likedPost))
                     },
-                    onCommentClick = {}
+                    onCommentClick = { onPostDetailNavigation(it)}
                 )
             }
 
@@ -228,13 +228,11 @@ fun ProfileHeaderSection(
             )
         }
     }
-
-
 }
 
 
 @Composable
-fun FollowsText(
+private fun FollowsText(
     modifier: Modifier = Modifier,
     count: Int,
     @StringRes text: Int,
@@ -271,7 +269,7 @@ fun FollowsText(
 
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun ProfileHeaderPreview() {
+private fun ProfileHeaderPreview() {
     SocialAppTheme {
         Surface(color = MaterialTheme.colors.surface) {
             ProfileHeaderSection(
@@ -286,12 +284,3 @@ fun ProfileHeaderPreview() {
         }
     }
 }
-
-
-
-
-
-
-
-
-

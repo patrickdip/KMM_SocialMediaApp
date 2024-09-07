@@ -16,6 +16,7 @@ import com.dipumba.ytsocialapp.follows.data.FollowsRepositoryImpl
 import com.dipumba.ytsocialapp.follows.domain.FollowsRepository
 import com.dipumba.ytsocialapp.follows.domain.usecase.FollowOrUnfollowUseCase
 import com.dipumba.ytsocialapp.follows.domain.usecase.GetFollowableUsersUseCase
+import com.dipumba.ytsocialapp.follows.domain.usecase.GetFollowsUseCase
 import com.dipumba.ytsocialapp.post.data.PostRepositoryImpl
 import com.dipumba.ytsocialapp.post.data.remote.PostCommentsApiService
 import com.dipumba.ytsocialapp.post.data.repository.PostCommentsRepositoryImpl
@@ -64,6 +65,7 @@ private val followsModule = module {
     factory { FollowsApiService() }
     factory { GetFollowableUsersUseCase() }
     factory { FollowOrUnfollowUseCase() }
+    factory { GetFollowsUseCase() }
 
     single<FollowsRepository> { FollowsRepositoryImpl(get(), get(), get()) }
 }
