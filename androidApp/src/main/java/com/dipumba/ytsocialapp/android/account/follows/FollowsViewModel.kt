@@ -24,7 +24,7 @@ class FollowsViewModel(
 
     private lateinit var pagingManager: PagingManager<FollowsUser>
 
-    fun fetchFollows(userId: Long, followsType: Int){
+    private fun fetchFollows(userId: Long, followsType: Int){
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             delay(1000)

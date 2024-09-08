@@ -4,8 +4,12 @@ import com.dipumba.ytsocialapp.account.data.model.ProfileApiResponse
 import com.dipumba.ytsocialapp.common.data.remote.KtorApi
 import com.dipumba.ytsocialapp.common.util.Constants
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.append
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.http.HttpMethod
 
 internal class AccountApiService : KtorApi() {
     suspend fun getProfile(
@@ -21,4 +25,43 @@ internal class AccountApiService : KtorApi() {
 
         return ProfileApiResponse(code = httpResponse.status, data = httpResponse.body())
     }
+
+    suspend fun updateProfile(
+        token: String,
+        profileData: String,
+        imageBytes: ByteArray?
+    ): ProfileApiResponse {
+        val httpResponse = client.submitFormWithBinaryData(
+            formData = formData {
+                append(key = "profile_data", value = profileData)
+                imageBytes?.let {
+                    append(
+                        key = "profile_image",
+                        value = it
+                    )
+                }
+            }
+        ){
+            endPoint(path = "/profile/update")
+            setToken(token = token)
+            setupMultipartRequest()
+            method = HttpMethod.Post
+        }
+        return ProfileApiResponse(code = httpResponse.status, data = httpResponse.body())
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

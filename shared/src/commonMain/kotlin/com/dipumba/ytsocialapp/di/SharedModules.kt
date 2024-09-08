@@ -4,6 +4,7 @@ import com.dipumba.ytsocialapp.account.data.AccountApiService
 import com.dipumba.ytsocialapp.account.data.repository.ProfileRepositoryImpl
 import com.dipumba.ytsocialapp.account.domain.repository.ProfileRepository
 import com.dipumba.ytsocialapp.account.domain.usecase.GetProfileUseCase
+import com.dipumba.ytsocialapp.account.domain.usecase.UpdateProfileUseCase
 import com.dipumba.ytsocialapp.auth.data.AuthRepositoryImpl
 import com.dipumba.ytsocialapp.auth.data.AuthService
 import com.dipumba.ytsocialapp.auth.domain.repository.AuthRepository
@@ -73,6 +74,7 @@ private val followsModule = module {
 private val accountModule = module {
     factory { AccountApiService() }
     factory { GetProfileUseCase() }
+    factory { UpdateProfileUseCase() }
     single<ProfileRepository> { ProfileRepositoryImpl(get(), get(), get()) }
 }
 

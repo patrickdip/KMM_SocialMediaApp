@@ -37,6 +37,10 @@ internal abstract class KtorApi {
             append(name = "Authorization", value = "Bearer $token")
         }
     }
+
+    fun HttpRequestBuilder.setupMultipartRequest(){
+        contentType(ContentType.MultiPart.FormData)
+    }
 }
 
 
