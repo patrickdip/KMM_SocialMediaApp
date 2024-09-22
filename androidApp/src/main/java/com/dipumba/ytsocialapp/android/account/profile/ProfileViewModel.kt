@@ -18,6 +18,7 @@ import com.dipumba.ytsocialapp.follows.domain.usecase.FollowOrUnfollowUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetUserPostsUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.LikeOrDislikePostUseCase
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,15 @@ class ProfileViewModel(
         private set
 
     private lateinit var pagingManager: PagingManager<Post>
+
+    init {
+        EventBus.events.onEach {
+            when (it) {
+                is Event.PostUpdated -> updatePost(it.post)
+                is Event.ProfileUpdated -> updateProfile(it.profile)
+            }
+        }.launchIn(viewModelScope)
+    }
 
 
     private fun fetchProfile(userId: Long){
@@ -166,6 +176,24 @@ class ProfileViewModel(
         profilePostsUiState = profilePostsUiState.copy(
             posts = profilePostsUiState.posts.map {
                 if (it.postId == post.postId) post else it
+            }
+        )
+    }
+
+    private fun updateProfile(profile: Profile) {
+        userInfoUiState = userInfoUiState.copy(
+            profile = profile
+        )
+        profilePostsUiState = profilePostsUiState.copy(
+            posts = profilePostsUiState.posts.map {
+                if (it.userId == profile.id) {
+                    it.copy(
+                        userName = profile.name,
+                        userImageUrl = profile.imageUrl
+                    )
+                }else{
+                    it
+                }
             }
         )
     }

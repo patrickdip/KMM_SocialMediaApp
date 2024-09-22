@@ -9,6 +9,8 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 
 internal class AccountApiService : KtorApi() {
@@ -37,7 +39,11 @@ internal class AccountApiService : KtorApi() {
                 imageBytes?.let {
                     append(
                         key = "profile_image",
-                        value = it
+                        value = it,
+                        headers = Headers.build {
+                            append(HttpHeaders.ContentType, value = "image/*")
+                            append(HttpHeaders.ContentDisposition, value = "filename=profile.jpg")
+                        }
                     )
                 }
             }

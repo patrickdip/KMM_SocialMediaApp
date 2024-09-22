@@ -1,5 +1,6 @@
 package com.dipumba.ytsocialapp.android.common.components
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
@@ -15,10 +16,11 @@ import com.dipumba.ytsocialapp.android.R
 fun CircleImage(
     modifier: Modifier,
     url: String?,
+    uri: Uri? = null,
     onClick: () -> Unit
 ) {
     AsyncImage(
-        model = url,
+        model = uri ?: url,
         contentDescription = null,
         modifier = modifier
             .clip(CircleShape)

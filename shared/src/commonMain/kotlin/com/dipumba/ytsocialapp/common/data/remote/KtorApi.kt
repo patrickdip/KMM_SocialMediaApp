@@ -11,7 +11,7 @@ import io.ktor.http.takeFrom
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-private const val BASE_URL = "http://192.168.0.103:8081/"
+private const val BASE_URL = "http://192.168.0.104:8081/"
 
 internal abstract class KtorApi {
 

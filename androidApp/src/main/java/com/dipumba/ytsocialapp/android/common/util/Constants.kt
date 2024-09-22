@@ -9,4 +9,5 @@ object Constants {
     const val EVENT_BUS_BUFFER_CAPACITY = 5
     const val COMMENTS_HEADER_KEY = "COMMENTS_HEADER_KEY"
     const val POST_ITEM_KEY = "POST_ITEM_KEY"
+    const val READING_IMAGE_BYTES_FAILURE_MESSAGE = "Failed to read image bytes"
 }

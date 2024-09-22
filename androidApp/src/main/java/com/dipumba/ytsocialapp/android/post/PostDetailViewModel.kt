@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dipumba.ytsocialapp.account.domain.model.Profile
 import com.dipumba.ytsocialapp.android.common.util.Constants
 import com.dipumba.ytsocialapp.android.common.util.DefaultPagingManager
 import com.dipumba.ytsocialapp.android.common.util.Event
@@ -44,6 +45,7 @@ class PostDetailViewModel(
             .onEach {
                 when (it) {
                     is Event.PostUpdated -> updatePost(it.post)
+                    is Event.ProfileUpdated -> updateCurrentUserProfileData(it.profile)
                 }
             }
             .launchIn(viewModelScope)
@@ -148,6 +150,29 @@ class PostDetailViewModel(
     private fun updatePost(post: Post){
         postUiState = postUiState.copy(
             post = post
+        )
+    }
+
+    private fun updateCurrentUserProfileData(profile: Profile) {
+        val post = postUiState.post ?: return
+        if (post.isOwnPost) {
+            val updatedPost = post.copy(
+                userName = profile.name,
+                userImageUrl = profile.imageUrl
+            )
+            updatePost(updatedPost)
+        }
+        commentsUiState = commentsUiState.copy(
+            comments = commentsUiState.comments.map {
+                if (it.userId == profile.id) {//should use it.isOwnComment
+                    it.copy(
+                        userName = profile.name,
+                        userImageUrl = profile.imageUrl
+                    )
+                } else {
+                    it
+                }
+            }
         )
     }
 

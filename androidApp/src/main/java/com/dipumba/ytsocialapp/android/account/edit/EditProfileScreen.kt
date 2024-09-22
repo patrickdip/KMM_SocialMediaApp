@@ -1,7 +1,10 @@
 package com.dipumba.ytsocialapp.android.account.edit
 
-import android.widget.Space
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +30,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -35,16 +42,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dipumba.ytsocialapp.android.R
 import com.dipumba.ytsocialapp.android.common.components.CircleImage
 import com.dipumba.ytsocialapp.android.common.components.CustomTextField
+import com.dipumba.ytsocialapp.android.common.components.ScreenLevelLoadingErrorView
+import com.dipumba.ytsocialapp.android.common.components.ScreenLevelLoadingView
 import com.dipumba.ytsocialapp.android.common.theming.ButtonHeight
 import com.dipumba.ytsocialapp.android.common.theming.ExtraLargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.Gray
 import com.dipumba.ytsocialapp.android.common.theming.LargeSpacing
 import com.dipumba.ytsocialapp.android.common.theming.SmallElevation
+import com.dipumba.ytsocialapp.android.common.util.toCurrentUrl
 
 @Composable
 fun EditProfileScreen(
@@ -53,107 +62,113 @@ fun EditProfileScreen(
     onNameChange: (String) -> Unit,
     bioTextFieldValue: TextFieldValue,
     onBioChange: (TextFieldValue) -> Unit,
-    onUploadButtonClick: () -> Unit,
     onUploadSucceed: () -> Unit,
-    fetchProfile: () -> Unit
+    userId: Long,
+    onUiAction: (EditProfileUiAction) -> Unit
 ) {
 
     val context = LocalContext.current
+    var selectedImage by remember { mutableStateOf<Uri?>(null) }
+    val pickImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> selectedImage = uri }
+    )
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        when {
-            editProfileUiState.profile != null -> {
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .background(
-                            color = if (isSystemInDarkTheme()) {
-                                MaterialTheme.colors.background
-                            } else {
-                                MaterialTheme.colors.surface
-                            }
-                        )
-                        .padding(ExtraLargeSpacing),
-                    verticalArrangement = Arrangement.spacedBy(LargeSpacing),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
 
-                    Box {
-                        CircleImage(
-                            modifier = modifier.size(120.dp),
-                            url = editProfileUiState.profile.profileUrl,
-                            onClick = {}
-                        )
-
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                            modifier = modifier
-                                .align(Alignment.BottomEnd)
-                                .shadow(
-                                    elevation = SmallElevation,
-                                    shape = RoundedCornerShape(percent = 25)
-                                )
-                                .background(
-                                    color = MaterialTheme.colors.surface,
-                                    shape = RoundedCornerShape(percent = 25)
-                                )
-                                .size(40.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Edit,
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.primary
-                            )
+        if (editProfileUiState.profile != null){
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            MaterialTheme.colors.background
+                        } else {
+                            MaterialTheme.colors.surface
                         }
-                    }
+                    )
+                    .padding(ExtraLargeSpacing),
+                verticalArrangement = Arrangement.spacedBy(LargeSpacing),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-                    Spacer(modifier = modifier.height(LargeSpacing))
-
-                    CustomTextField(
-                        value = editProfileUiState.profile.name,
-                        onValueChange = onNameChange,
-                        hint = R.string.username_hint
+                Box {
+                    CircleImage(
+                        modifier = modifier.size(120.dp),
+                        url = editProfileUiState.profile.imageUrl?.toCurrentUrl(),
+                        uri = selectedImage,
+                        onClick = {}
                     )
 
-                    BioTextField(value = bioTextFieldValue, onValueChange = onBioChange)
-
-                    Button(
+                    IconButton(
                         onClick = {
-                            onUploadButtonClick()
+                            pickImage.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
                         },
                         modifier = modifier
-                            .fillMaxWidth()
-                            .height(ButtonHeight),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 0.dp
-                        ),
-                        shape = MaterialTheme.shapes.medium
+                            .align(Alignment.BottomEnd)
+                            .shadow(
+                                elevation = SmallElevation,
+                                shape = RoundedCornerShape(percent = 25)
+                            )
+                            .background(
+                                color = MaterialTheme.colors.surface,
+                                shape = RoundedCornerShape(percent = 25)
+                            )
+                            .size(40.dp)
                     ) {
-                        Text(text = stringResource(id = R.string.upload_changes_text))
-                    }
-
-                }
-            }
-
-            editProfileUiState.errorMessage != null -> {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.could_not_load_profile),
-                        style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
-                    )
-
-                    Button(
-                        onClick = fetchProfile,
-                        modifier = modifier.height(ButtonHeight),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 0.dp
-                        ),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text(text = stringResource(id = R.string.retry_button_text))
+                        Icon(
+                            imageVector = Icons.Rounded.Edit,
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary
+                        )
                     }
                 }
+
+                Spacer(modifier = modifier.height(LargeSpacing))
+
+                CustomTextField(
+                    value = editProfileUiState.profile.name,
+                    onValueChange = onNameChange,
+                    hint = R.string.username_hint
+                )
+
+                BioTextField(value = bioTextFieldValue, onValueChange = onBioChange)
+
+                Button(
+                    onClick = {
+                        selectedImage?.let {
+                            onUiAction(EditProfileUiAction.UploadProfileAction(imageUri = it))
+                        } ?: run {
+                            // No image selected, proceed with no image
+                            onUiAction(EditProfileUiAction.UploadProfileAction())
+                        }
+                    },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(ButtonHeight),
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp
+                    ),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(text = stringResource(id = R.string.upload_changes_text))
+                }
+
             }
+        }
+
+        if (editProfileUiState.profile == null && editProfileUiState.errorMessage != null){
+            ScreenLevelLoadingErrorView {
+                onUiAction(EditProfileUiAction.FetchProfileAction(userId = userId))
+            }
+        }
+
+        if (editProfileUiState.isLoading) {
+            ScreenLevelLoadingView()
         }
 
         if (editProfileUiState.isLoading){
@@ -161,7 +176,9 @@ fun EditProfileScreen(
         }
     }
 
-    LaunchedEffect(key1 = Unit, block = { fetchProfile() })
+    LaunchedEffect(key1 = Unit, block = {
+        onUiAction(EditProfileUiAction.FetchProfileAction(userId = userId))
+    })
 
     LaunchedEffect(
         key1 = editProfileUiState.uploadSucceed,
