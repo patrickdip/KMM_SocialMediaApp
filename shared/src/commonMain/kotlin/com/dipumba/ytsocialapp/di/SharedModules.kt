@@ -24,6 +24,7 @@ import com.dipumba.ytsocialapp.post.data.repository.PostCommentsRepositoryImpl
 import com.dipumba.ytsocialapp.post.domain.repository.PostCommentsRepository
 import com.dipumba.ytsocialapp.post.domain.repository.PostRepository
 import com.dipumba.ytsocialapp.post.domain.usecase.AddPostCommentUseCase
+import com.dipumba.ytsocialapp.post.domain.usecase.CreatePostUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostCommentsUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostUseCase
 import com.dipumba.ytsocialapp.post.domain.usecase.GetPostsUseCase
@@ -49,6 +50,7 @@ private val postModule = module {
     factory { LikeOrDislikePostUseCase() }
     factory { GetUserPostsUseCase() }
     factory { GetPostUseCase() }
+    factory { CreatePostUseCase() }
 
     single<PostRepository> { PostRepositoryImpl(get(), get(), get()) }
 }

@@ -11,4 +11,5 @@ object Constants {
     const val INVALID_INPUT_EMAIL_MESSAGE = "Invalid email: cannot be empty and must contain '@'"
     const val INVALID_INPUT_PASSWORD_MESSAGE = "Invalid password: cannot be empty or less than 4 characters"
     const val INVALID_INPUT_BIO_MESSAGE = "Invalid bio: cannot be empty or exceed 150 characters"
+    const val INVALID_INPUT_POST_CAPTION_MESSAGE = "Invalid caption: cannot be empty or exceed 200 characters"
 }

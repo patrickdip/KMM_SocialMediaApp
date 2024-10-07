@@ -9,4 +9,5 @@ interface PostRepository {
 
     suspend fun getUserPosts(userId: Long, page: Int, pageSize: Int): Result<List<Post>>
     suspend fun getPost(postId: Long): Result<Post>
+    suspend fun createPost(caption: String, imageBytes: ByteArray): Result<Post>
 }

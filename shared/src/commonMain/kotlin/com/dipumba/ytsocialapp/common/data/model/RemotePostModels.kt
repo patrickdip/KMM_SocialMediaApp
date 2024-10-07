@@ -61,6 +61,12 @@ internal data class PostApiResponse(
     val data: PostApiResponseData
 )
 
+@Serializable
+internal data class NewPostParams(
+    val caption: String,
+    val userId: Long
+)
+
 
 
 
