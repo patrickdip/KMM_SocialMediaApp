@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.dipumba.ytsocialapp.android.R
 import com.dipumba.ytsocialapp.android.common.theming.SmallElevation
+import com.dipumba.ytsocialapp.android.destinations.CreatePostDestination
 import com.dipumba.ytsocialapp.android.destinations.EditProfileDestination
 import com.dipumba.ytsocialapp.android.destinations.FollowersDestination
 import com.dipumba.ytsocialapp.android.destinations.FollowingDestination
@@ -77,6 +78,7 @@ private fun getAppBarTitle(currentDestinationRoute: String?): Int {
         EditProfileDestination.route -> R.string.edit_profile_destination_title
         FollowingDestination.route -> R.string.following_text
         FollowersDestination.route -> R.string.followers_text
+        CreatePostDestination.route -> R.string.create_post_destination_title
         else -> R.string.no_destination_title
     }
 }

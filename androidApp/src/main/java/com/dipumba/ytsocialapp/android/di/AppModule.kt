@@ -9,6 +9,7 @@ import com.dipumba.ytsocialapp.android.auth.signup.SignUpViewModel
 import com.dipumba.ytsocialapp.android.common.util.ImageBytesReader
 import com.dipumba.ytsocialapp.android.home.HomeScreenViewModel
 import com.dipumba.ytsocialapp.android.post.PostDetailViewModel
+import com.dipumba.ytsocialapp.android.post.create_post.CreatePostViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -23,4 +24,5 @@ val appModule = module {
     viewModel { EditProfileViewModel(get(), get(), get()) }
     viewModel { FollowsViewModel(get()) }
     single { ImageBytesReader(androidContext()) }
+    viewModel { CreatePostViewModel(get(), get()) }
 }

@@ -34,4 +34,8 @@
     <string name="comment_more_actions_title">Comment</string>
     <string name="delete_comment_action">Delete comment</string>
     <string name="view_profile_action">View 1%s profile</string>
+    <string name="post_caption_hint">Add post caption</string>
+    <string name="create_post_destination_title">New post</string>
+    <string name="create_post_button_label">Create post</string>
+    <string name="select_post_image_label">Post image:</string>
 </resources>

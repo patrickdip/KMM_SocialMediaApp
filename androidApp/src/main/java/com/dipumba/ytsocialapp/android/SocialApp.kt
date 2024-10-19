@@ -1,9 +1,14 @@
 package com.dipumba.ytsocialapp.android
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +20,7 @@ import com.dipumba.ytsocialapp.android.destinations.HomeDestination
 import com.dipumba.ytsocialapp.android.destinations.LoginDestination
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.utils.currentDestinationAsState
 
 @Composable
 fun SocialApp(
@@ -41,6 +47,26 @@ fun SocialApp(
         scaffoldState = scaffoldState,
         topBar = {
             AppBar(modifier = Modifier, navHostController = navHostController)
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = navHostController.currentDestinationAsState().value == HomeDestination
+            ){
+                FloatingActionButton(
+                    onClick = {
+                        navHostController.navigate(
+                            route = "create_post"
+                        )
+                    },
+                    backgroundColor = MaterialTheme.colors.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.onPrimary
+                    )
+                }
+            }
         }
     ) {innerPaddings ->
         DestinationsNavHost(
